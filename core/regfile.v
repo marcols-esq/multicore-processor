@@ -1,7 +1,7 @@
 module REGFILE #(
-	parameter integer DATA_W,
-	parameter integer ADDR_W,
-	parameter integer SIZE = 2**ADDR_W;
+	parameter integer DATA_W = 0,
+	parameter integer ADDR_W = 0,
+	parameter integer SIZE = 2**ADDR_W
 ) (
 	input  wire 			 clk,
 	input  wire				 en,

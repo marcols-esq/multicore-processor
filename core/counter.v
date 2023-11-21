@@ -1,5 +1,5 @@
 module COUNTER #(
-    parameter integer W
+    parameter integer W = 0
 )(
     input wire  clk,
     input wire  en,

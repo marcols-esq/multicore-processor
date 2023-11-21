@@ -1,0 +1,52 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Tue Nov 21 22:17:02 2023
+[*]
+[dumpfile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1_tb.vcd"
+[dumpfile_mtime] "Tue Nov 21 22:11:42 2023"
+[dumpfile_size] 6395
+[savefile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -165 -165
+*-5.930773 91 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test1_tb.
+[treeopen] test1_tb.DUT.
+[sst_width] 211
+[signals_width] 478
+[sst_expanded] 1
+[sst_vpaned_height] 301
+@28
+test1_tb.DUT.clk
+@200
+-aha
+@28
+test1_tb.DUT.FE_ID_flush
+test1_tb.DUT.FE_ID_inst[31:0]
+test1_tb.DUT.ID_EX_reg_addr_r1[4:0]
+@22
+test1_tb.DUT.ID_EX_reg_addr_r2[4:0]
+test1_tb.DUT.ID_EX_reg_addr_rd[4:0]
+test1_tb.DUT.ID_EX_reg_data_r1[31:0]
+test1_tb.DUT.ID_EX_reg_data_r2[31:0]
+@28
+test1_tb.DUT.ID_EX_reg_wr
+@29
+test1_tb.DUT.clk
+@28
+test1_tb.DUT.en
+@22
+test1_tb.DUT.progmem_addr[31:0]
+test1_tb.DUT.progmem_data[31:0]
+test1_tb.DUT.regfile_addr1[4:0]
+test1_tb.DUT.regfile_addr2[4:0]
+test1_tb.DUT.regfile_addr_wr[4:0]
+test1_tb.DUT.regfile_data1[31:0]
+test1_tb.DUT.regfile_data2[31:0]
+test1_tb.DUT.regfile_data_wr[31:0]
+@200
+-
+@22
+test1_tb.DUT.ID_EX_reg_addr_r2[4:0]
+[pattern_trace] 1
+[pattern_trace] 0
