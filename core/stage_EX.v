@@ -25,9 +25,11 @@ module STAGE_EX (
 
     // Execution result
 
+    output reg                      out_reg_wr,
+    output reg  [`REG_ADDR_W-1:0]   out_reg_addr_rd,
 	output reg  [`DATA_W-1:0]		out_alu_res,
 
-	output reg 						out_flush
+	output reg 						out_flush = 1'b1
     
 );
 
@@ -56,7 +58,8 @@ module STAGE_EX (
     always @(posedge clk) begin
         if(en && !stall) begin
 			out_alu_res 	<= alu_res;
-
+			out_reg_wr 		<= reg_wr;
+			out_reg_addr_rd <= reg_addr_rd;
 			out_flush		<= flush;
         end
     end

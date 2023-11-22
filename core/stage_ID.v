@@ -36,7 +36,7 @@ module STAGE_ID (
     // output wire [`DATA_W-1:0]       out_alu_arg1,
     // output wire [`DATA_W-1:0]       out_alu_arg2,
 
-    output reg                      out_flush
+    output reg                      out_flush = 1'b1
 );
 
     // decoedd instruction
@@ -55,13 +55,15 @@ module STAGE_ID (
                                               func7 == `func7_ALU_1;
 
     wire                    is_alu_r        = opcode == `OPCODE_ALUR && is_alu_func7;
-    wire                    is_alu_imm      = opcode == `OPCODE_ALUI && is_alu_func7;
+    wire                    is_alu_imm      = opcode == `OPCODE_ALUI;
 
-    wire                    is_alu_rev      = func7[5] && is_alu_imm;
+    wire                    is_alu          = is_alu_r || is_alu_imm;
+
+    wire                    is_alu_rev      = func7[5] && is_alu_r;
     wire [3:0]              alu_op          = {is_alu_rev, func3};
 
     wire [31:0]             imm             = 
-        is_alu_imm ? imm_I :
+        is_alu_imm ? { {20{inst[31]}}, imm_I} :
                      32'hx;
 
     wire [`ALU_SRC_W-1:0]   alu_src_arg1    = `ALU_SRC_R;
@@ -71,10 +73,10 @@ module STAGE_ID (
 
     //
 
-    wire                    reg_wr          = 0;
     wire [`REG_ADDR_W-1:0]  reg_addr_rd     = inst[11:7];
     wire [`REG_ADDR_W-1:0]  reg_addr_r1     = inst[19:15];
     wire [`REG_ADDR_W-1:0]  reg_addr_r2     = inst[24:20];
+    wire                    reg_wr          = is_alu ? reg_addr_rd != 0 : 1'b0;
 
     // wire [`DATA_W-1:0]      last_reg_data_r1 = regfile_data1;
     // wire [`DATA_W-1:0]      last_reg_data_r2 = regfile_data2;

@@ -34,10 +34,11 @@ STAGE_FE stage_fe(
 
 // STAGE ID with REGFILE
 
- wire [`REG_ADDR_W-1:0] regfile_addr_wr = 0;
+ wire                   regfile_wr;
+ wire [`REG_ADDR_W-1:0] regfile_addr_wr;
  wire [`REG_ADDR_W-1:0] regfile_addr1;
  wire [`REG_ADDR_W-1:0] regfile_addr2;
- wire [`DATA_W-1:0]     regfile_data_wr = 0;
+ wire [`DATA_W-1:0]     regfile_data_wr;
  wire [`DATA_W-1:0]     regfile_data1;
  wire [`DATA_W-1:0]     regfile_data2;
 
@@ -48,7 +49,7 @@ REGFILE #(
 	.clk            (clk),
 	.en             (en),
 
-	.wr             (1'b0),
+	.wr             (regfile_wr),
 	.addr_wr        (regfile_addr_wr),
 	.addr1          (regfile_addr1),
 	.addr2          (regfile_addr2),
@@ -105,6 +106,9 @@ STAGE_ID stage_id (
 // STAGE EX
 
 wire [`DATA_W-1:0]		EX_MM_alu_res;
+wire                    EX_MM_reg_wr;
+wire [`REG_ADDR_W-1:0]  EX_MM_reg_addr_rd;
+
 wire					EX_MM_flush;
 
 STAGE_EX stage_ex(
@@ -132,10 +136,65 @@ STAGE_EX stage_ex(
     // Execution result
 
 	.out_alu_res                (EX_MM_alu_res),
+    .out_reg_wr                 (EX_MM_reg_wr),
+    .out_reg_addr_rd            (EX_MM_reg_addr_rd),
 
 	.out_flush                  (EX_MM_flush)
     
 );
 
+// STAGE_MM
+
+
+wire [`DATA_W-1:0]		MM_WB_alu_res;
+wire                    MM_WB_reg_wr;
+wire [`REG_ADDR_W-1:0]  MM_WB_reg_addr_rd;
+
+wire					MM_WB_flush;
+
+STAGE_MM stage_mm (
+    .clk                        (clk),
+    .en                         (en),
+    .stall                      (1'b0),
+
+    // from STAGE_EX
+
+    .flush                      (EX_MM_flush),
+
+	.reg_wr                     (EX_MM_reg_wr),
+	.reg_addr_rd                (EX_MM_reg_addr_rd),
+	.alu_res                    (EX_MM_alu_res),
+
+
+    // To STAGE_WB
+
+	.out_reg_wr                 (MM_WB_reg_wr),
+	.out_reg_addr_rd            (MM_WB_reg_addr_rd),
+	.out_alu_res                (MM_WB_alu_res),
+
+	.out_flush                  (MM_WB_flush)
+);
+
+// STAGE_WB
+
+STAGE_WB stage_wb (
+    // .clk                        (clk),
+    // .en                         (en),
+    .stall                      (1'b0),
+
+    // from STAGE_MM
+
+    .flush                      (MM_WB_flush),
+
+	.reg_wr                     (MM_WB_reg_wr),
+	.reg_addr_rd                (MM_WB_reg_addr_rd),
+	.alu_res                    (MM_WB_alu_res),
+
+    // interface with REGFILE
+
+	.regfile_wr                 (regfile_wr),
+	.regfile_addr_wr            (regfile_addr_wr),
+	.regfile_data_wr            (regfile_data_wr)
+);
 
 endmodule

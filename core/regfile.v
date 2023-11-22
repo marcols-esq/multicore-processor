@@ -23,8 +23,8 @@ always @(posedge clk) begin
 		if(wr && addr_wr != 0) begin
 			REGS[addr_wr] <= data_wr;
 		end
-		data_out1 <= addr1 ? (addr1 == addr_wr ? data_wr : REGS[addr1]) : 0;
-		data_out2 <= addr2 ? (addr2 == addr_wr ? data_wr : REGS[addr2]) : 0;
+		data_out1 <= addr1 ? ((wr && addr1 == addr_wr) ? data_wr : REGS[addr1]) : 0;
+		data_out2 <= addr2 ? ((wr && addr2 == addr_wr) ? data_wr : REGS[addr2]) : 0;
 	end
 end
 

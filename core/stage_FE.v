@@ -14,7 +14,7 @@ module STAGE_FE(
 
     // Fetched instruction
 
-    output reg                      out_flush,
+    output reg                      out_flush = 1'b1,
     output reg  [`INST_W-1:0]       out_inst
 );
 
