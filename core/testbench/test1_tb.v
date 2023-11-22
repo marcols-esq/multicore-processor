@@ -6,7 +6,7 @@ module test1_tb();
 reg clk = 0;
 reg en = 1;
 
-reg [`INST_W-1:0] test_progmem [0:20];
+reg [`INST_W-1:0] test_progmem [0:40];
 initial begin
     test_progmem[0] = {12'd2,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
     test_progmem[1] = {-12'd10, 5'd0, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
@@ -25,6 +25,30 @@ initial begin
     test_progmem[12] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
     test_progmem[13] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
     test_progmem[14] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+
+    test_progmem[15] = {12'h002,  5'd0, `func3_ADD_SUB, 5'd2, `OPCODE_ALUI};
+    test_progmem[16] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[17] = {12'h020,  5'd2, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
+    test_progmem[18] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[19] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[20] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    
+    test_progmem[21] = {12'h003,  5'd0, `func3_ADD_SUB, 5'd2, `OPCODE_ALUI};
+    test_progmem[22] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[23] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[24] = {12'h030,  5'd2, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
+    test_progmem[25] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[26] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[27] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    
+    test_progmem[28] = {12'h004,  5'd0, `func3_ADD_SUB, 5'd2, `OPCODE_ALUI};
+    test_progmem[29] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[30] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[31] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[32] = {12'h040,  5'd2, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
+    test_progmem[33] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[34] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[35] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
 end
 
 
