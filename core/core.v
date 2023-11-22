@@ -57,12 +57,16 @@ REGFILE #(
 	.data_out2      (regfile_data2)
 );
 
+wire                     ID_EX_flush;
 wire                     ID_EX_reg_wr;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_rd;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_r1;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_r2;
-wire [`DATA_W-1:0]       ID_EX_reg_data_r1;
-wire [`DATA_W-1:0]       ID_EX_reg_data_r2;
+
+wire [3:0]               ID_EX_alu_op;
+wire [`ALU_SRC_W-1:0]    ID_EX_alu_src_arg1;
+wire [`ALU_SRC_W-1:0]    ID_EX_alu_src_arg2;
+wire [`DATA_W-1:0]       ID_EX_imm;
 
 STAGE_ID stage_id (
     .clk            (clk),
@@ -78,17 +82,59 @@ STAGE_ID stage_id (
 
     .regfile_addr1  (regfile_addr1),
     .regfile_addr2  (regfile_addr2),
-    .regfile_data1  (regfile_data1),
-    .regfile_data2  (regfile_data2),
+    // .regfile_data1  (regfile_data1),
+    // .regfile_data2  (regfile_data2),
     
     // decoded instruction
 
-    .out_reg_wr      (ID_EX_reg_wr),
-    .out_reg_addr_rd (ID_EX_reg_addr_rd),
-    .out_reg_addr_r1 (ID_EX_reg_addr_r1),
-    .out_reg_addr_r2 (ID_EX_reg_addr_r2),
-    .out_reg_data_r1 (ID_EX_reg_data_r1),
-    .out_reg_data_r2 (ID_EX_reg_data_r2)
+    .out_reg_wr          (ID_EX_reg_wr),
+    .out_reg_addr_rd     (ID_EX_reg_addr_rd),
+    .out_reg_addr_r1     (ID_EX_reg_addr_r1),
+    .out_reg_addr_r2     (ID_EX_reg_addr_r2),
+
+    .out_alu_op          (ID_EX_alu_op),
+    .out_alu_src_arg1    (ID_EX_alu_src_arg1),
+    .out_alu_src_arg2    (ID_EX_alu_src_arg2),
+
+    .out_imm             (ID_EX_imm),
+
+    .out_flush           (ID_EX_flush)
+);
+
+
+// STAGE EX
+
+wire [`DATA_W-1:0]		EX_MM_alu_res;
+wire					EX_MM_flush;
+
+STAGE_EX stage_ex(
+    .clk                        (clk),
+    .en                         (en),
+    .stall                      (1'b0),
+
+    // from STAGE_ID
+
+    .flush                      (ID_EX_flush),
+
+    .reg_wr                     (ID_EX_reg_wr),
+    .reg_addr_rd                (ID_EX_reg_addr_rd),
+    .reg_addr_r1                (ID_EX_reg_addr_r1),
+    .reg_addr_r2                (ID_EX_reg_addr_r2),
+
+    .alu_op                     (ID_EX_alu_op),
+	.alu_src_arg1               (ID_EX_alu_src_arg1),
+	.alu_src_arg2               (ID_EX_alu_src_arg2),
+
+    .imm                        (ID_EX_imm),
+    .reg_data_r1                (regfile_data1),
+    .reg_data_r2                (regfile_data2),
+    
+    // Execution result
+
+	.out_alu_res                (EX_MM_alu_res),
+
+	.out_flush                  (EX_MM_flush)
+    
 );
 
 

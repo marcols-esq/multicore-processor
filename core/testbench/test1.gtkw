@@ -1,52 +1,57 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Tue Nov 21 22:17:02 2023
+[*] Wed Nov 22 13:28:35 2023
 [*]
-[dumpfile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1_tb.vcd"
-[dumpfile_mtime] "Tue Nov 21 22:11:42 2023"
-[dumpfile_size] 6395
-[savefile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1.gtkw"
+[dumpfile] "C:\Users\bondg\Desktop\MSC\multicore-processor\core\testbench\test1_tb.vcd"
+[dumpfile_mtime] "Wed Nov 22 13:26:25 2023"
+[dumpfile_size] 13459
+[savefile] "C:\Users\bondg\Desktop\MSC\multicore-processor\core\testbench\test1.gtkw"
 [timestart] 0
-[size] 1920 1017
-[pos] -165 -165
-*-5.930773 91 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1536 801
+[pos] -1 -1
+*-5.930773 36 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test1_tb.
 [treeopen] test1_tb.DUT.
 [sst_width] 211
 [signals_width] 478
 [sst_expanded] 1
-[sst_vpaned_height] 301
-@28
-test1_tb.DUT.clk
+[sst_vpaned_height] 282
 @200
--aha
+-FE
 @28
-test1_tb.DUT.FE_ID_flush
-test1_tb.DUT.FE_ID_inst[31:0]
-test1_tb.DUT.ID_EX_reg_addr_r1[4:0]
+test1_tb.DUT.stage_fe.clk
+test1_tb.DUT.stage_fe.en
+test1_tb.DUT.stage_fe.flush
+test1_tb.DUT.stage_fe.stall
 @22
-test1_tb.DUT.ID_EX_reg_addr_r2[4:0]
-test1_tb.DUT.ID_EX_reg_addr_rd[4:0]
-test1_tb.DUT.ID_EX_reg_data_r1[31:0]
-test1_tb.DUT.ID_EX_reg_data_r2[31:0]
-@28
-test1_tb.DUT.ID_EX_reg_wr
-@29
-test1_tb.DUT.clk
-@28
-test1_tb.DUT.en
-@22
-test1_tb.DUT.progmem_addr[31:0]
-test1_tb.DUT.progmem_data[31:0]
-test1_tb.DUT.regfile_addr1[4:0]
-test1_tb.DUT.regfile_addr2[4:0]
-test1_tb.DUT.regfile_addr_wr[4:0]
-test1_tb.DUT.regfile_data1[31:0]
-test1_tb.DUT.regfile_data2[31:0]
-test1_tb.DUT.regfile_data_wr[31:0]
+test1_tb.DUT.stage_fe.PC[31:0]
+test1_tb.DUT.stage_fe.inst[31:0]
 @200
--
+-ID
+@28
+test1_tb.DUT.stage_id.clk
+test1_tb.DUT.stage_id.en
+test1_tb.DUT.stage_id.flush
+test1_tb.DUT.stage_id.stall
+test1_tb.DUT.stage_id.reg_wr
 @22
-test1_tb.DUT.ID_EX_reg_addr_r2[4:0]
+test1_tb.DUT.stage_id.reg_addr_rd[4:0]
+test1_tb.DUT.stage_id.alu_op[3:0]
+test1_tb.DUT.stage_id.reg_addr_r1[4:0]
+test1_tb.DUT.stage_id.reg_addr_r2[4:0]
+test1_tb.DUT.stage_id.imm[31:0]
+@28
+test1_tb.DUT.stage_id.alu_src_arg1[1:0]
+test1_tb.DUT.stage_id.alu_src_arg2[1:0]
+@200
+-EX
+@28
+test1_tb.DUT.stage_ex.clk
+test1_tb.DUT.stage_ex.en
+test1_tb.DUT.stage_ex.flush
+test1_tb.DUT.stage_ex.stall
+@22
+test1_tb.DUT.stage_ex.alu_op[3:0]
+test1_tb.DUT.stage_ex.alu_res[31:0]
 [pattern_trace] 1
 [pattern_trace] 0
