@@ -133,6 +133,20 @@ STAGE_EX stage_ex(
     .reg_data_r1                (regfile_data1),
     .reg_data_r2                (regfile_data2),
     
+
+	// FFW From STAGE_EX
+    .ffw_EX_reg_wr              (EX_MM_reg_wr),
+    .ffw_EX_reg_addr_rd         (EX_MM_reg_addr_rd),
+    .ffw_EX_reg_data_rd         (EX_MM_alu_res),
+	// FFW From STAGE_MM
+    .ffw_MM_reg_wr              (MM_WB_reg_wr),
+    .ffw_MM_reg_addr_rd         (MM_WB_reg_addr_rd),
+    .ffw_MM_reg_data_rd         (MM_WB_alu_res),
+	// // FFW From STAGE_WB
+    // .ffw_WB_reg_wr              (regfile_wr),
+    // .ffw_WB_reg_addr_rd         (regfile_addr_wr),
+    // .ffw_WB_reg_data_rd         (regfile_data_wr),
+
     // Execution result
 
 	.out_alu_res                (EX_MM_alu_res),

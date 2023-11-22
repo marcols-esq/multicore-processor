@@ -20,8 +20,8 @@ initial begin
     test_progmem[8] = {12'h004,  5'd1, `func3_ADD_SUB, 5'd1, `OPCODE_ALUI};
     test_progmem[9] = {12'h008,  5'd1, `func3_ADD_SUB, 5'd1, `OPCODE_ALUI};
     
-    test_progmem[10] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
-    test_progmem[11] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
+    test_progmem[10] = {12'h001,  5'd0, `func3_ADD_SUB, 5'd2, `OPCODE_ALUI};
+    test_progmem[11] = {12'h010,  5'd2, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
     test_progmem[12] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
     test_progmem[13] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
     test_progmem[14] = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};

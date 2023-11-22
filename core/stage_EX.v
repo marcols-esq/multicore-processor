@@ -23,6 +23,19 @@ module STAGE_EX (
 	input  wire [`DATA_W-1:0]		reg_data_r1,
 	input  wire [`DATA_W-1:0]		reg_data_r2,
 
+	// FFW From STAGE_EX
+    input  wire                     ffw_EX_reg_wr,
+    input  wire [`REG_ADDR_W-1:0]   ffw_EX_reg_addr_rd,
+    input  wire [`DATA_W-1:0]   	ffw_EX_reg_data_rd,
+	// FFW From STAGE_MM
+    input  wire                     ffw_MM_reg_wr,
+    input  wire [`REG_ADDR_W-1:0]   ffw_MM_reg_addr_rd,
+    input  wire [`DATA_W-1:0]   	ffw_MM_reg_data_rd,
+	// // FFW From STAGE_WB
+    // input  wire                     ffw_WB_reg_wr,
+    // input  wire [`REG_ADDR_W-1:0]   ffw_WB_reg_addr_rd,
+    // input  wire [`DATA_W-1:0]   	ffw_WB_reg_data_rd,
+
     // Execution result
 
     output reg                      out_reg_wr,
@@ -36,12 +49,18 @@ module STAGE_EX (
 	// Argumennts decode
 	
     wire [`DATA_W-1:0] alu_arg1 = 
-        alu_src_arg1 == `ALU_SRC_R ? 	reg_data_r1 : 
-                                      	imm;
+        // alu_src_arg1 == `ALU_SRC_IMM 						 ? 	imm :
+		(ffw_EX_reg_wr && ffw_EX_reg_addr_rd == reg_addr_r1) ? 	ffw_EX_reg_data_rd :
+		(ffw_MM_reg_wr && ffw_EX_reg_addr_rd == reg_addr_r1) ? 	ffw_MM_reg_data_rd :
+		// (ffw_WB_reg_wr && ffw_EX_reg_addr_rd == reg_addr_r1) ? 	ffw_WB_reg_data_rd :
+																reg_data_r1;
 									  
     wire [`DATA_W-1:0] alu_arg2 = 
-        alu_src_arg2 == `ALU_SRC_R ? 	reg_data_r2 : 
-                                     	imm;
+        alu_src_arg2 == `ALU_SRC_IMM 						 ? 	imm :
+		(ffw_EX_reg_wr && ffw_EX_reg_addr_rd == reg_addr_r2) ? 	ffw_EX_reg_data_rd :
+		(ffw_MM_reg_wr && ffw_EX_reg_addr_rd == reg_addr_r2) ? 	ffw_MM_reg_data_rd :
+		// (ffw_WB_reg_wr && ffw_EX_reg_addr_rd == reg_addr_r2) ? 	ffw_WB_reg_data_rd :
+																reg_data_r2;
 
 
 	// ALU
