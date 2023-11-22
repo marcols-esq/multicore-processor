@@ -6,6 +6,7 @@
 
 `define OPCODE_ALUI   7'b0010011
 `define OPCODE_ALUR   7'b0110011
+`define OPCODE_BRANCH 7'b1100011
 
 `define func7_ALU_0   7'b0000000
 `define func7_ALU_1   7'b0100000
@@ -13,6 +14,10 @@
 `define func3_ADD_SUB 3'b000
 `define func3_XOR	  3'b100
 `define func3_AND	  3'b111
+
+`define func3_BEQ     3'b000
+`define func3_BNE	  3'b001
+`define func3_BGE	  3'b101
 
 
 `define ALU_SRC_W  2

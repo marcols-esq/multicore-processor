@@ -36,6 +36,9 @@ module STAGE_ID (
     // output wire [`DATA_W-1:0]       out_alu_arg1,
     // output wire [`DATA_W-1:0]       out_alu_arg2,
 
+    output reg                      out_is_branch,
+    output reg  [2:0]               out_branch_type,
+
     output reg                      out_flush = 1'b1
 );
 
@@ -54,22 +57,33 @@ module STAGE_ID (
     wire                    is_alu_func7    = func7 == `func7_ALU_0 || 
                                               func7 == `func7_ALU_1;
 
+    wire                    is_branch       = opcode == `OPCODE_BRANCH;
+    wire [2:0]              branch_type     = func3;
+
+
     wire                    is_alu_r        = opcode == `OPCODE_ALUR && is_alu_func7;
     wire                    is_alu_imm      = opcode == `OPCODE_ALUI;
 
     wire                    is_alu          = is_alu_r || is_alu_imm;
-
     wire                    is_alu_rev      = func7[5] && is_alu_r;
-    wire [3:0]              alu_op          = {is_alu_rev, func3};
+
+    wire [3:0]              alu_op          = 
+        is_alu  ? {is_alu_rev, func3} : 
+        is_branch ?
+            func3 == `func3_BGE ? `ALU_OP_SUB :
+                                  `ALU_OP_XOR :
+        4'bx;
+
 
     wire [31:0]             imm             = 
         is_alu_imm ? { {20{inst[31]}}, imm_I} :
+        is_branch  ? { {19{inst[31]}}, imm_B, 1'b0 } :
                      32'hx;
 
     wire [`ALU_SRC_W-1:0]   alu_src_arg1    = `ALU_SRC_R;
     wire [`ALU_SRC_W-1:0]   alu_src_arg2    =
-        is_alu_r ? `ALU_SRC_R :
-                   `ALU_SRC_IMM;
+        is_alu_imm ? `ALU_SRC_IMM :
+                     `ALU_SRC_R;
 
     //
 
@@ -100,6 +114,10 @@ module STAGE_ID (
             out_alu_src_arg1     <= alu_src_arg1;
             out_alu_src_arg2     <= alu_src_arg2;
             out_imm              <= imm;
+
+            out_is_branch        <= is_branch;
+            out_branch_type      <= branch_type;
+
             out_flush            <= flush;
         end
     end

@@ -23,6 +23,9 @@ module STAGE_EX (
 	input  wire [`DATA_W-1:0]		reg_data_r1,
 	input  wire [`DATA_W-1:0]		reg_data_r2,
 
+    input  wire                     is_branch,
+    input  wire [2:0]               branch_type,
+
 	// FFW From STAGE_EX
     input  wire                     ffw_EX_reg_wr,
     input  wire [`REG_ADDR_W-1:0]   ffw_EX_reg_addr_rd,
