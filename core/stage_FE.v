@@ -7,6 +7,11 @@ module STAGE_FE(
     input  wire                     flush,
     input  wire                     stall,
 
+    // Jumps
+
+    input  wire                     jump,
+    input  wire [`INST_ADDR_W-1:0]  jump_addr,
+
     // Interface with PROGRAM MEMORY
 
     input  wire [`INST_W-1:0]       progmem_data,
@@ -14,29 +19,36 @@ module STAGE_FE(
 
     // Fetched instruction
 
-    output reg                      out_flush = 1'b1,
-    output reg  [`INST_W-1:0]       out_inst
+    output reg  [`INST_ADDR_W-1:0]  out_pc,
+    output reg  [`INST_W-1:0]       out_inst,
+    output reg                      out_flush_jump,
+    output reg                      out_flush = 1'b1
 );
 
 
     // Program counter
-    reg [`INST_ADDR_W-1:0] PC = 0;    
+    reg  [`INST_ADDR_W-1:0] PC      = 0;
+    wire [`INST_ADDR_W-1:0] PC_next = jump ? jump_addr : PC + 3'h4;    
 
     assign progmem_addr = PC;
     wire [`INST_W-1:0] inst = progmem_data;
 
     always @(posedge clk) begin
         if(en && !stall) begin
-            PC <= flush ? 0 : PC + 1'd1;
+            PC <= flush ? 0 : PC_next;
         end
     end
+
+    // assign out_pc = PC;
     
     // Pipelining registers
 
     always @(posedge clk) begin
         if(en && !stall) begin
-            out_flush <= flush;
-            out_inst  <= inst;
+            out_flush       <= flush;
+            out_flush_jump  <= jump;
+            out_inst        <= inst;
+            out_pc          <= PC;
         end
     end
 

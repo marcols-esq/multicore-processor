@@ -10,6 +10,7 @@ module STAGE_ID (
 
     input  wire                     flush,
     input  wire [`INST_W-1:0]       inst,
+    input  wire [`INST_ADDR_W-1:0]  pc,
 
     // interface with REGFILE
 
@@ -39,6 +40,8 @@ module STAGE_ID (
     output reg                      out_is_branch,
     output reg  [2:0]               out_branch_type,
 
+
+    output reg  [`INST_ADDR_W-1:0]  out_pc,
     output reg                      out_flush = 1'b1
 );
 
@@ -68,11 +71,9 @@ module STAGE_ID (
     wire                    is_alu_rev      = func7[5] && is_alu_r;
 
     wire [3:0]              alu_op          = 
-        is_alu  ? {is_alu_rev, func3} : 
-        is_branch ?
-            func3 == `func3_BGE ? `ALU_OP_SUB :
-                                  `ALU_OP_XOR :
-        4'bx;
+        is_alu      ? {is_alu_rev, func3} : 
+        is_branch   ? `ALU_OP_ADD :
+                      4'bx;
 
 
     wire [31:0]             imm             = 
@@ -80,17 +81,20 @@ module STAGE_ID (
         is_branch  ? { {19{inst[31]}}, imm_B, 1'b0 } :
                      32'hx;
 
-    wire [`ALU_SRC_W-1:0]   alu_src_arg1    = `ALU_SRC_R;
-    wire [`ALU_SRC_W-1:0]   alu_src_arg2    =
-        is_alu_imm ? `ALU_SRC_IMM :
+    wire [`ALU_SRC_W-1:0]   alu_src_arg1    =
+        is_branch  ? `ALU_SRC_PC :
                      `ALU_SRC_R;
+    
+    wire [`ALU_SRC_W-1:0]   alu_src_arg2    =
+        is_alu_r   ? `ALU_SRC_R :
+                     `ALU_SRC_IMM;
 
     //
 
     wire [`REG_ADDR_W-1:0]  reg_addr_rd     = inst[11:7];
     wire [`REG_ADDR_W-1:0]  reg_addr_r1     = inst[19:15];
     wire [`REG_ADDR_W-1:0]  reg_addr_r2     = inst[24:20];
-    wire                    reg_wr          = is_alu ? reg_addr_rd != 0 : 1'b0;
+    wire                    reg_wr          = !flush && (is_alu ? reg_addr_rd != 0 : 1'b0);
 
     // wire [`DATA_W-1:0]      last_reg_data_r1 = regfile_data1;
     // wire [`DATA_W-1:0]      last_reg_data_r2 = regfile_data2;
@@ -118,6 +122,7 @@ module STAGE_ID (
             out_is_branch        <= is_branch;
             out_branch_type      <= branch_type;
 
+            out_pc               <= pc;
             out_flush            <= flush;
         end
     end

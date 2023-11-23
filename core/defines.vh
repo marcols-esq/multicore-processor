@@ -17,12 +17,16 @@
 
 `define func3_BEQ     3'b000
 `define func3_BNE	  3'b001
+`define func3_BLT	  3'b100
 `define func3_BGE	  3'b101
+`define func3_BLTU	  3'b110
+`define func3_BGEU	  3'b111
 
 
-`define ALU_SRC_W  2
-`define ALU_SRC_R   `ALU_SRC_W'h0
-`define ALU_SRC_IMM `ALU_SRC_W'h1
+`define ALU_SRC_W     2
+`define ALU_SRC_R     `ALU_SRC_W'h0
+`define ALU_SRC_IMM   `ALU_SRC_W'h1
+`define ALU_SRC_PC    `ALU_SRC_W'h2
 
 `define ALU_OP_ADD    4'b0000
 `define ALU_OP_SUB    4'b1000

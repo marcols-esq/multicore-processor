@@ -9,9 +9,15 @@ module CORE (
 );
 
 
-// STAGE FE
+// STAGE FE with JUMPS
+
+wire                     jump;
+wire [`INST_ADDR_W-1:0]  jump_addr;
+wire                     flush_jump;
+
 
 wire                     FE_ID_flush;
+wire [`INST_ADDR_W-1:0]  FE_ID_pc;
 wire [`INST_W-1:0]       FE_ID_inst;
 
 
@@ -21,6 +27,11 @@ STAGE_FE stage_fe(
     .stall          (1'b0),
     .flush          (1'b0),
 
+    // Jumps
+    
+    .jump           (jump),
+    .jump_addr      (jump_addr),
+
     // Interface with PROGRAM MEMORY
 
     .progmem_data   (progmem_data),
@@ -28,8 +39,11 @@ STAGE_FE stage_fe(
 
     // Fetched instruction
 
-    .out_flush      (FE_ID_flush),
-    .out_inst       (FE_ID_inst)
+    .out_flush_jump (flush_jump),
+    .out_inst       (FE_ID_inst),
+
+    .out_pc         (FE_ID_pc),
+    .out_flush      (FE_ID_flush)
 );
 
 // STAGE ID with REGFILE
@@ -59,6 +73,7 @@ REGFILE #(
 );
 
 wire                     ID_EX_flush;
+wire [`INST_ADDR_W-1:0]  ID_EX_pc;
 wire                     ID_EX_reg_wr;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_rd;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_r1;
@@ -69,6 +84,9 @@ wire [`ALU_SRC_W-1:0]    ID_EX_alu_src_arg1;
 wire [`ALU_SRC_W-1:0]    ID_EX_alu_src_arg2;
 wire [`DATA_W-1:0]       ID_EX_imm;
 
+wire                     ID_EX_is_branch;
+wire [2:0]               ID_EX_branch_type;
+
 STAGE_ID stage_id (
     .clk            (clk),
     .en             (en),
@@ -76,8 +94,9 @@ STAGE_ID stage_id (
 
     // from STAGE_FE
 
-    .flush          (FE_ID_flush),
+    .flush          (FE_ID_flush || flush_jump),
     .inst           (FE_ID_inst),
+    .pc             (FE_ID_pc),
 
     // interface with REGFILE
 
@@ -97,8 +116,13 @@ STAGE_ID stage_id (
     .out_alu_src_arg1    (ID_EX_alu_src_arg1),
     .out_alu_src_arg2    (ID_EX_alu_src_arg2),
 
+
+    .out_is_branch       (ID_EX_is_branch),
+    .out_branch_type     (ID_EX_branch_type),
+
     .out_imm             (ID_EX_imm),
 
+    .out_pc              (ID_EX_pc),
     .out_flush           (ID_EX_flush)
 );
 
@@ -111,6 +135,10 @@ wire [`REG_ADDR_W-1:0]  EX_MM_reg_addr_rd;
 
 wire					EX_MM_flush;
 
+wire [`DATA_W-1:0]		MM_WB_alu_res;
+wire                    MM_WB_reg_wr;
+wire [`REG_ADDR_W-1:0]  MM_WB_reg_addr_rd;
+
 STAGE_EX stage_ex(
     .clk                        (clk),
     .en                         (en),
@@ -118,7 +146,8 @@ STAGE_EX stage_ex(
 
     // from STAGE_ID
 
-    .flush                      (ID_EX_flush),
+    .flush                      (ID_EX_flush || flush_jump),
+    .pc                         (ID_EX_pc),
 
     .reg_wr                     (ID_EX_reg_wr),
     .reg_addr_rd                (ID_EX_reg_addr_rd),
@@ -132,6 +161,9 @@ STAGE_EX stage_ex(
     .imm                        (ID_EX_imm),
     .reg_data_r1                (regfile_data1),
     .reg_data_r2                (regfile_data2),
+
+    .is_branch                  (ID_EX_is_branch),
+    .branch_type                (ID_EX_branch_type),
     
 
 	// FFW From STAGE_EX
@@ -147,6 +179,11 @@ STAGE_EX stage_ex(
     // .ffw_WB_reg_addr_rd         (regfile_addr_wr),
     // .ffw_WB_reg_data_rd         (regfile_data_wr),
 
+    // JUMP
+    
+    .jump                       (jump),
+    .jump_addr                  (jump_addr),
+
     // Execution result
 
 	.out_alu_res                (EX_MM_alu_res),
@@ -158,11 +195,6 @@ STAGE_EX stage_ex(
 );
 
 // STAGE_MM
-
-
-wire [`DATA_W-1:0]		MM_WB_alu_res;
-wire                    MM_WB_reg_wr;
-wire [`REG_ADDR_W-1:0]  MM_WB_reg_addr_rd;
 
 wire					MM_WB_flush;
 
