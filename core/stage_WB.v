@@ -12,7 +12,7 @@ module STAGE_WB (
 
 	input  wire 					reg_wr,
 	input  wire [`REG_ADDR_W-1:0]	reg_addr_rd,
-	input  wire [`DATA_W-1:0]		alu_res,
+	input  wire [`DATA_W-1:0]		reg_data_rd,
 
     // interface with REGFILE
 
@@ -24,7 +24,7 @@ module STAGE_WB (
 
     assign regfile_wr           =   reg_wr && !flush && !stall;
     assign regfile_addr_wr      =   reg_addr_rd;
-    assign regfile_data_wr      =   alu_res;
+    assign regfile_data_wr      =   reg_data_rd;
 
 
 endmodule

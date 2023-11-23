@@ -4,9 +4,13 @@
 `define INST_W 32
 `define DATA_W 32
 
+`define OPCODE_LUI    7'b0110111
 `define OPCODE_ALUI   7'b0010011
 `define OPCODE_ALUR   7'b0110011
 `define OPCODE_BRANCH 7'b1100011
+`define OPCODE_JALR   7'b1100111
+
+// `define LINK_REG      `REG_ADDR_W'd2;
 
 `define func7_ALU_0   7'b0000000
 `define func7_ALU_1   7'b0100000

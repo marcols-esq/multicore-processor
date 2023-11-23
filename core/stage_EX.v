@@ -24,8 +24,12 @@ module STAGE_EX (
 	input  wire [`DATA_W-1:0]		reg_data_r1,
 	input  wire [`DATA_W-1:0]		reg_data_r2,
 
+    input  wire                     is_jump,
+    // input  wire                     is_call,
+    // input  wire                     is_ret,
     input  wire                     is_branch,
     input  wire [2:0]               branch_type,
+    // input  wire [`INST_ADDR_W-1:0]  next_ret_addr,
 
 	// FFW From STAGE_EX
     input  wire                     ffw_EX_reg_wr,
@@ -49,7 +53,7 @@ module STAGE_EX (
 
     output reg                      out_reg_wr,
     output reg  [`REG_ADDR_W-1:0]   out_reg_addr_rd,
-	output reg  [`DATA_W-1:0]		out_alu_res,
+	output reg  [`DATA_W-1:0]		out_reg_data_rd,
 
 	output reg 						out_flush = 1'b1
     
@@ -97,16 +101,18 @@ module STAGE_EX (
                                       1'b0;
     wire               perform_branch = is_branch && branch_condition;
 
-    assign             jump         = perform_branch && !flush;
+    assign             jump         = (is_jump || perform_branch) && !flush;
     assign             jump_addr    = alu_res;
 
+    wire [`DATA_W-1:0] data_to_wr   = is_jump   ? pc + 3'd4     :
+                                                  alu_res;
     // Pipelining registers
 
     always @(posedge clk) begin
         if(en && !stall) begin
-			out_alu_res 	<= alu_res;
 			out_reg_wr 		<= reg_wr && !flush;
 			out_reg_addr_rd <= reg_addr_rd;
+			out_reg_data_rd <= data_to_wr;
 			out_flush		<= flush;
         end
     end

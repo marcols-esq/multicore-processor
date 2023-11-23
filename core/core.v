@@ -84,6 +84,7 @@ wire [`ALU_SRC_W-1:0]    ID_EX_alu_src_arg1;
 wire [`ALU_SRC_W-1:0]    ID_EX_alu_src_arg2;
 wire [`DATA_W-1:0]       ID_EX_imm;
 
+wire                     ID_EX_is_jump;
 wire                     ID_EX_is_branch;
 wire [2:0]               ID_EX_branch_type;
 
@@ -116,7 +117,7 @@ STAGE_ID stage_id (
     .out_alu_src_arg1    (ID_EX_alu_src_arg1),
     .out_alu_src_arg2    (ID_EX_alu_src_arg2),
 
-
+    .out_is_jump         (ID_EX_is_jump),
     .out_is_branch       (ID_EX_is_branch),
     .out_branch_type     (ID_EX_branch_type),
 
@@ -129,13 +130,13 @@ STAGE_ID stage_id (
 
 // STAGE EX
 
-wire [`DATA_W-1:0]		EX_MM_alu_res;
 wire                    EX_MM_reg_wr;
 wire [`REG_ADDR_W-1:0]  EX_MM_reg_addr_rd;
+wire [`DATA_W-1:0]		EX_MM_reg_data_rd;
 
 wire					EX_MM_flush;
 
-wire [`DATA_W-1:0]		MM_WB_alu_res;
+wire [`DATA_W-1:0]		MM_WB_reg_data_rd;
 wire                    MM_WB_reg_wr;
 wire [`REG_ADDR_W-1:0]  MM_WB_reg_addr_rd;
 
@@ -162,6 +163,7 @@ STAGE_EX stage_ex(
     .reg_data_r1                (regfile_data1),
     .reg_data_r2                (regfile_data2),
 
+    .is_jump                    (ID_EX_is_jump),
     .is_branch                  (ID_EX_is_branch),
     .branch_type                (ID_EX_branch_type),
     
@@ -169,11 +171,11 @@ STAGE_EX stage_ex(
 	// FFW From STAGE_EX
     .ffw_EX_reg_wr              (EX_MM_reg_wr),
     .ffw_EX_reg_addr_rd         (EX_MM_reg_addr_rd),
-    .ffw_EX_reg_data_rd         (EX_MM_alu_res),
+    .ffw_EX_reg_data_rd         (EX_MM_reg_data_rd),
 	// FFW From STAGE_MM
     .ffw_MM_reg_wr              (MM_WB_reg_wr),
     .ffw_MM_reg_addr_rd         (MM_WB_reg_addr_rd),
-    .ffw_MM_reg_data_rd         (MM_WB_alu_res),
+    .ffw_MM_reg_data_rd         (MM_WB_reg_data_rd),
 	// // FFW From STAGE_WB
     // .ffw_WB_reg_wr              (regfile_wr),
     // .ffw_WB_reg_addr_rd         (regfile_addr_wr),
@@ -186,9 +188,9 @@ STAGE_EX stage_ex(
 
     // Execution result
 
-	.out_alu_res                (EX_MM_alu_res),
     .out_reg_wr                 (EX_MM_reg_wr),
     .out_reg_addr_rd            (EX_MM_reg_addr_rd),
+	.out_reg_data_rd            (EX_MM_reg_data_rd),
 
 	.out_flush                  (EX_MM_flush)
     
@@ -209,14 +211,14 @@ STAGE_MM stage_mm (
 
 	.reg_wr                     (EX_MM_reg_wr),
 	.reg_addr_rd                (EX_MM_reg_addr_rd),
-	.alu_res                    (EX_MM_alu_res),
+	.reg_data_rd                (EX_MM_reg_data_rd),
 
 
     // To STAGE_WB
 
 	.out_reg_wr                 (MM_WB_reg_wr),
 	.out_reg_addr_rd            (MM_WB_reg_addr_rd),
-	.out_alu_res                (MM_WB_alu_res),
+	.out_reg_data_rd            (MM_WB_reg_data_rd),
 
 	.out_flush                  (MM_WB_flush)
 );
@@ -234,7 +236,7 @@ STAGE_WB stage_wb (
 
 	.reg_wr                     (MM_WB_reg_wr),
 	.reg_addr_rd                (MM_WB_reg_addr_rd),
-	.alu_res                    (MM_WB_alu_res),
+	.reg_data_rd                (MM_WB_reg_data_rd),
 
     // interface with REGFILE
 

@@ -37,6 +37,9 @@ module STAGE_ID (
     // output wire [`DATA_W-1:0]       out_alu_arg1,
     // output wire [`DATA_W-1:0]       out_alu_arg2,
 
+    output reg                      out_is_jump,
+    output reg                      out_is_call,
+    output reg                      out_is_ret,
     output reg                      out_is_branch,
     output reg  [2:0]               out_branch_type,
 
@@ -56,12 +59,22 @@ module STAGE_ID (
     wire [19:0]             imm_U           = inst[31:12];
     wire [19:0]             imm_J           = {inst[31], inst[19:12], inst[20], inst[30:21]};
 
+    wire                    is_lui          = opcode == `OPCODE_LUI;
+
+    wire [`REG_ADDR_W-1:0]  reg_addr_rd     = inst[11:7];
+    wire [`REG_ADDR_W-1:0]  reg_addr_r1     = is_lui ? `REG_ADDR_W'd0 : inst[19:15];
+    wire [`REG_ADDR_W-1:0]  reg_addr_r2     = inst[24:20];
+
 
     wire                    is_alu_func7    = func7 == `func7_ALU_0 || 
                                               func7 == `func7_ALU_1;
 
     wire                    is_branch       = opcode == `OPCODE_BRANCH;
     wire [2:0]              branch_type     = func3;
+
+    wire                    is_jump         = opcode == `OPCODE_JALR;
+    // wire                    is_call         = is_jump && (reg_addr_rd == `LINK_REG && reg_addr_r1 != `LINK_REG);
+    // wire                    is_ret          = is_jump && (reg_addr_rd == `LINK_REG && reg_addr_r1 == `LINK_REG);
 
 
     wire                    is_alu_r        = opcode == `OPCODE_ALUR && is_alu_func7;
@@ -70,14 +83,19 @@ module STAGE_ID (
     wire                    is_alu          = is_alu_r || is_alu_imm;
     wire                    is_alu_rev      = func7[5] && is_alu_r;
 
+
     wire [3:0]              alu_op          = 
         is_alu      ? {is_alu_rev, func3} : 
+        is_lui      ? `ALU_OP_ADD : 
+        is_jump     ? `ALU_OP_ADD : 
         is_branch   ? `ALU_OP_ADD :
                       4'bx;
 
 
     wire [31:0]             imm             = 
         is_alu_imm ? { {20{inst[31]}}, imm_I} :
+        is_lui     ? { imm_U,          12'd0} :
+        is_jump    ? { {20{inst[31]}}, imm_I} :
         is_branch  ? { {19{inst[31]}}, imm_B, 1'b0 } :
                      32'hx;
 
@@ -89,12 +107,8 @@ module STAGE_ID (
         is_alu_r   ? `ALU_SRC_R :
                      `ALU_SRC_IMM;
 
-    //
-
-    wire [`REG_ADDR_W-1:0]  reg_addr_rd     = inst[11:7];
-    wire [`REG_ADDR_W-1:0]  reg_addr_r1     = inst[19:15];
-    wire [`REG_ADDR_W-1:0]  reg_addr_r2     = inst[24:20];
-    wire                    reg_wr          = !flush && (is_alu ? reg_addr_rd != 0 : 1'b0);
+    
+    wire                    reg_wr          = !flush && ((is_lui || is_alu || is_jump) ? reg_addr_rd != 0 : 1'b0);
 
     // wire [`DATA_W-1:0]      last_reg_data_r1 = regfile_data1;
     // wire [`DATA_W-1:0]      last_reg_data_r2 = regfile_data2;
@@ -121,6 +135,9 @@ module STAGE_ID (
 
             out_is_branch        <= is_branch;
             out_branch_type      <= branch_type;
+            out_is_jump          <= is_jump;
+            // out_is_call          <= is_call;
+            // out_is_ret           <= is_ret;
 
             out_pc               <= pc;
             out_flush            <= flush;
