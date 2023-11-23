@@ -5,6 +5,7 @@ module REGFILE #(
 ) (
 	input  wire 			 clk,
 	input  wire				 en,
+	input  wire				 stall,
 	input  wire 			 wr,
 
 	input  wire [ADDR_W-1:0] addr_wr,
@@ -19,7 +20,7 @@ module REGFILE #(
 reg [DATA_W-1:0] REGS [1:SIZE-1];
 
 always @(posedge clk) begin
-	if(en) begin
+	if(en && !stall) begin
 		if(wr && addr_wr != 0) begin
 			REGS[addr_wr] <= data_wr;
 		end

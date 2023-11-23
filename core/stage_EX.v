@@ -11,6 +11,9 @@ module STAGE_EX (
     input  wire                     flush,
     input  wire [`INST_ADDR_W-1:0]  pc,
 
+    input  wire                     is_load,
+    input  wire                     is_store,
+
     input  wire                     reg_wr,
     input  wire [`REG_ADDR_W-1:0]   reg_addr_rd,
     input  wire [`REG_ADDR_W-1:0]   reg_addr_r1,
@@ -33,6 +36,7 @@ module STAGE_EX (
 
 	// FFW From STAGE_EX
     input  wire                     ffw_EX_reg_wr,
+    // input  wire                     ffw_EX_load,
     input  wire [`REG_ADDR_W-1:0]   ffw_EX_reg_addr_rd,
     input  wire [`DATA_W-1:0]   	ffw_EX_reg_data_rd,
 	// FFW From STAGE_MM
@@ -48,12 +52,17 @@ module STAGE_EX (
 
     output wire                     jump,
     output wire [`INST_ADDR_W-1:0]  jump_addr,
+    output wire [`DATA_ADDR_W-1:0]  mem_addr,
 
     // Execution result
 
     output reg                      out_reg_wr,
     output reg  [`REG_ADDR_W-1:0]   out_reg_addr_rd,
 	output reg  [`DATA_W-1:0]		out_reg_data_rd,
+	output reg  [`DATA_ADDR_W-1:0]	out_alu_mem_addr,
+    
+    output reg                      out_is_load = 1'b1,
+    output reg                      out_is_store = 1'b1,
 
 	output reg 						out_flush = 1'b1
     
@@ -61,6 +70,7 @@ module STAGE_EX (
 
 	// Argumennts decode
 
+    // assign en_ffw_load_MM_EX = ffw_EX_load && (ffw_EX_reg_addr_rd == reg_addr_r1); 
 	
     wire [`DATA_W-1:0] reg_data_r1_ffw = 
 		(ffw_EX_reg_wr && ffw_EX_reg_addr_rd == reg_addr_r1) ? 	ffw_EX_reg_data_rd :
@@ -103,16 +113,21 @@ module STAGE_EX (
 
     assign             jump         = (is_jump || perform_branch) && !flush;
     assign             jump_addr    = alu_res;
+    assign             mem_addr     = alu_res;
 
     wire [`DATA_W-1:0] data_to_wr   = is_jump   ? pc + 3'd4     :
+                                      is_store  ? reg_data_r2_ffw :
                                                   alu_res;
     // Pipelining registers
 
     always @(posedge clk) begin
         if(en && !stall) begin
-			out_reg_wr 		<= reg_wr && !flush;
+			out_reg_wr 		<= reg_wr   && !flush;
+			out_is_load 	<= is_load  && !flush;
+			out_is_store 	<= is_store && !flush;
 			out_reg_addr_rd <= reg_addr_rd;
 			out_reg_data_rd <= data_to_wr;
+            out_alu_mem_addr<= mem_addr;
 			out_flush		<= flush;
         end
     end

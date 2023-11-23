@@ -21,6 +21,8 @@ module STAGE_ID (
     
     // decoded instruction
 
+    output reg                      out_is_load,
+    output reg                      out_is_store,
     output reg                      out_reg_wr,
     output reg  [`REG_ADDR_W-1:0]   out_reg_addr_rd,
     output reg  [`REG_ADDR_W-1:0]   out_reg_addr_r1,
@@ -59,6 +61,9 @@ module STAGE_ID (
     wire [19:0]             imm_U           = inst[31:12];
     wire [19:0]             imm_J           = {inst[31], inst[19:12], inst[20], inst[30:21]};
 
+    wire                    is_store        = !flush && (opcode == `OPCODE_STORE);
+    wire                    is_load         = !flush && (opcode == `OPCODE_LOAD);
+
     wire                    is_lui          = opcode == `OPCODE_LUI;
 
     wire [`REG_ADDR_W-1:0]  reg_addr_rd     = inst[11:7];
@@ -84,18 +89,15 @@ module STAGE_ID (
     wire                    is_alu_rev      = func7[5] && is_alu_r;
 
 
-    wire [3:0]              alu_op          = 
-        is_alu      ? {is_alu_rev, func3} : 
-        is_lui      ? `ALU_OP_ADD : 
-        is_jump     ? `ALU_OP_ADD : 
-        is_branch   ? `ALU_OP_ADD :
-                      4'bx;
+    wire [3:0]              alu_op          = is_alu ? {is_alu_rev, func3} : `ALU_OP_ADD;
 
 
     wire [31:0]             imm             = 
-        is_alu_imm ? { {20{inst[31]}}, imm_I} :
-        is_lui     ? { imm_U,          12'd0} :
         is_jump    ? { {20{inst[31]}}, imm_I} :
+        is_load    ? { {20{inst[31]}}, imm_I} :
+        is_alu_imm ? { {20{inst[31]}}, imm_I} :
+        is_store   ? { {20{inst[31]}}, imm_S} :
+        is_lui     ? { imm_U,          12'd0} :
         is_branch  ? { {19{inst[31]}}, imm_B, 1'b0 } :
                      32'hx;
 
@@ -108,7 +110,7 @@ module STAGE_ID (
                      `ALU_SRC_IMM;
 
     
-    wire                    reg_wr          = !flush && ((is_lui || is_alu || is_jump) ? reg_addr_rd != 0 : 1'b0);
+    wire                    reg_wr          = !flush && ((is_load || is_lui || is_alu || is_jump) ? reg_addr_rd != 0 : 1'b0);
 
     // wire [`DATA_W-1:0]      last_reg_data_r1 = regfile_data1;
     // wire [`DATA_W-1:0]      last_reg_data_r2 = regfile_data2;
@@ -124,6 +126,9 @@ module STAGE_ID (
 
     always @(posedge clk) begin
         if(en && !stall) begin
+
+            out_is_store         <= is_store;
+            out_is_load          <= is_load;
             out_reg_wr           <= reg_wr;
             out_reg_addr_rd      <= reg_addr_rd;
             out_reg_addr_r1      <= reg_addr_r1;

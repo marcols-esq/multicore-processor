@@ -34,6 +34,15 @@ begin
 end
 endfunction
 
+function [31:0] LOAD (input [4:0] r1, input [11:0] imm, input [4:0] rd); begin
+    LOAD = {imm, r1, 3'b010, rd, `OPCODE_LOAD};
+end
+endfunction
+function [31:0] STORE (input [4:0] r1, input [11:0] imm, input [4:0] r2); begin
+    STORE = {imm[11:5], r2, r1, 3'b010, imm[4:0], `OPCODE_STORE};
+end
+endfunction
+
 reg [31:0] NOP = {12'h000,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
 
 reg [`INST_W-1:0] test_progmem [0:400];
@@ -76,9 +85,9 @@ initial begin
     test_progmem[30] = NOP;
     test_progmem[31] = NOP;
     test_progmem[32] = {12'h040,  5'd2, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
-    test_progmem[33] = LUI(32'hABCDE000, 5'd1);
-    test_progmem[34] = JALR(5'd1, -12'h4, 5'd0);
+    test_progmem[33] = JALR(5'd0, 12'd100 * 4, 5'd0);
 
+    test_progmem[34] = NOP;
     test_progmem[35] = ADDI(5'd0, 12'd0,  5'd3);
     test_progmem[36] = ADDI(5'd0, 12'd2,  5'd2);
     test_progmem[37] = BRANCH(`func3_BEQ, 5'd2, 5'd2, 12'd10 * 4);
@@ -93,7 +102,7 @@ initial begin
     test_progmem[50] = BRANCH(`func3_BNE, 5'd2, 5'd0, -12'd2 * 4);
     
     test_progmem[51] = ADDI(5'd0, -12'h1, 5'd1);
-    test_progmem[52] = ADDI(5'd0,  12'h1, 5'd2);
+    test_progmem[52] = ADDI(5'd0,  12'h2, 5'd2);
     test_progmem[53] = BRANCH(`func3_BLT,  5'd1, 5'd2, 12'd2 * 4);
     test_progmem[54] = ADDI(5'd0,  12'hAA, 5'd3);
     test_progmem[55] = BRANCH(`func3_BLTU, 5'd1, 5'd2, 12'd2 * 4);
@@ -101,21 +110,77 @@ initial begin
     test_progmem[57] = JALR(5'd5, 12'd0, 5'd0);
 
     // test_progmem[99] = JALR(5'd0, 12'd99*4, 5'd0);
+
+    test_progmem[100] = ADDI(5'd0, 12'd200,  5'd1);
+    test_progmem[101] = LOAD(5'd1, -12'd100, 5'd2);
+    test_progmem[102] = LOAD(5'd0, 12'd200,  5'd3);
+    test_progmem[103] = LOAD(5'd1, 12'd100,  5'd4);
     
+    test_progmem[104] = ADDR(5'd3, 5'd4,     5'd5);
+    test_progmem[105] = STORE(5'd1, 12'd0,   5'd5);
+    test_progmem[106] = LOAD(5'd0, 12'd200,  5'd1);
+    test_progmem[107] = LUI(32'hABCDE000, 5'd1);
+    test_progmem[108] = JALR(5'd1, -12'h4, 5'd0);
+    
+    // test_progmem[104] = NOP;
+    // test_progmem[105] = NOP;
+    // test_progmem[106] = NOP;
+    // test_progmem[107] = ADDR(5'd3, 5'd4,     5'd5);
+    // test_progmem[108] = STORE(5'd1, 12'd0,   5'd5);
+    // test_progmem[109] = LOAD(5'd0, 12'd200,  5'd1);
+    // test_progmem[110] = LUI(32'hABCDE000, 5'd1);
+    // test_progmem[111] = JALR(5'd1, -12'h4, 5'd0);
+
 
 end
 
-
-
 wire [`INST_ADDR_W-1:0]  progmem_addr;
 wire [`INST_W-1:0]       progmem_data = test_progmem[progmem_addr >> 2];
+
+
+wire [`DATA_W-1:0]       mem_data_r;
+wire [`DATA_W-1:0]       mem_data_w;
+wire [`DATA_ADDR_W-1:0]  mem_addr;
+wire                     mem_read;
+wire                     mem_write;
+wire                     mem_wait;
+
+DUMMY_RAM  #(
+	.DATA_W(`DATA_W),
+	.ADDR_W(`DATA_ADDR_W),
+	.SIZE(1000)
+) ram (
+	.clk(clk),
+	.en(en),
+    
+    .mem_data_r (mem_data_r),
+    .mem_data_w (mem_data_w),
+    .mem_addr   (mem_addr),
+    .mem_read   (mem_read),
+    .mem_write  (mem_write),
+    .mem_wait   (mem_wait)
+
+);
+
+initial begin
+    ram.data[100] = 1;
+    ram.data[200] = 4;
+    ram.data[300] = 32'h1ABCDEF0;
+end
 
 CORE DUT (
     .clk            (clk),
     .en             (en),
 
     .progmem_data   (progmem_data),
-    .progmem_addr   (progmem_addr)
+    .progmem_addr   (progmem_addr),
+
+    .mem_data_r (mem_data_r),
+    .mem_data_w (mem_data_w),
+    .mem_addr   (mem_addr),
+    .mem_read   (mem_read),
+    .mem_write  (mem_write),
+    .mem_wait   (mem_wait)
 );
 
 

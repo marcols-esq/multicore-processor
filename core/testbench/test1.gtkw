@@ -1,17 +1,18 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Thu Nov 23 14:13:28 2023
+[*] Thu Nov 23 18:15:31 2023
 [*]
 [dumpfile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1_tb.vcd"
-[dumpfile_mtime] "Thu Nov 23 14:11:19 2023"
-[dumpfile_size] 64946
+[dumpfile_mtime] "Thu Nov 23 18:14:03 2023"
+[dumpfile_size] 89153
 [savefile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1.gtkw"
-[timestart] 1080
+[timestart] 1344
 [size] 1920 1017
 [pos] -1 -1
-*-5.930773 1259 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.930773 1538 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test1_tb.
 [treeopen] test1_tb.DUT.
+[treeopen] test1_tb.DUT.stage_mm.
 [sst_width] 211
 [signals_width] 478
 [sst_expanded] 1
@@ -19,16 +20,17 @@
 @200
 -FE
 @28
+test1_tb.ram.mem_wait
 test1_tb.DUT.stage_fe.clk
 [color] 2
 test1_tb.DUT.stage_fe.flush
+test1_tb.DUT.stage_fe.stall
 @24
 test1_tb.DUT.stage_fe.PC[31:0]
-@23
+@22
 test1_tb.DUT.stage_fe.PC[31:0]
 @28
 test1_tb.DUT.stage_fe.en
-test1_tb.DUT.stage_fe.stall
 test1_tb.DUT.stage_fe.jump
 @24
 test1_tb.DUT.stage_fe.jump_addr[31:0]
@@ -39,11 +41,14 @@ test1_tb.DUT.stage_fe.inst[31:0]
 @28
 [color] 2
 test1_tb.DUT.stage_id.flush
+test1_tb.DUT.stage_id.stall
 @24
 test1_tb.DUT.stage_id.pc[31:0]
 @28
 test1_tb.DUT.stage_id.reg_wr
 test1_tb.DUT.stage_id.is_lui
+test1_tb.DUT.stage_id.is_store
+test1_tb.DUT.stage_id.is_load
 @24
 test1_tb.DUT.stage_id.reg_addr_rd[4:0]
 @22
@@ -53,6 +58,9 @@ test1_tb.DUT.stage_id.reg_addr_r1[4:0]
 test1_tb.DUT.stage_id.reg_addr_r2[4:0]
 @22
 test1_tb.DUT.stage_id.imm[31:0]
+@24
+test1_tb.DUT.stage_id.imm[31:0]
+@22
 test1_tb.DUT.stage_id.alu_src_arg1[1:0]
 test1_tb.DUT.stage_id.alu_src_arg2[1:0]
 @28
@@ -64,6 +72,7 @@ test1_tb.DUT.stage_id.branch_type[2:0]
 @28
 [color] 2
 test1_tb.DUT.stage_ex.flush
+test1_tb.DUT.stage_ex.stall
 @24
 test1_tb.DUT.stage_ex.pc[31:0]
 @22
@@ -89,7 +98,7 @@ test1_tb.DUT.stage_ex.is_jump
 test1_tb.DUT.stage_ex.is_branch
 test1_tb.DUT.stage_ex.branch_type[2:0]
 test1_tb.DUT.stage_ex.reg_wr
-@c00022
+@c00024
 test1_tb.DUT.stage_ex.data_to_wr[31:0]
 @28
 (0)test1_tb.DUT.stage_ex.data_to_wr[31:0]
@@ -128,17 +137,30 @@ test1_tb.DUT.stage_ex.data_to_wr[31:0]
 -group_end
 @24
 test1_tb.DUT.stage_ex.reg_addr_rd[4:0]
+@28
+test1_tb.DUT.stage_ex.is_store
+test1_tb.DUT.stage_ex.is_load
 @200
 -MM
 @28
 [color] 2
 test1_tb.DUT.stage_mm.flush
+@29
+test1_tb.DUT.stage_mm.stall
+@28
 test1_tb.DUT.stage_mm.reg_wr
+test1_tb.DUT.stage_mm.is_load
+test1_tb.DUT.stage_mm.is_store
+@24
+test1_tb.DUT.stage_mm.alu_mem_addr[31:0]
+@22
+test1_tb.DUT.stage_mm.true_data_to_wr[31:0]
 @200
 -WB
 @28
 [color] 2
 test1_tb.DUT.stage_wb.flush
+test1_tb.DUT.stage_wb.stall
 test1_tb.DUT.stage_wb.regfile_wr
 @24
 test1_tb.DUT.stage_wb.regfile_addr_wr[4:0]
@@ -152,5 +174,19 @@ test1_tb.REG2[31:0]
 test1_tb.REG3[31:0]
 test1_tb.REG4[31:0]
 test1_tb.REG5[31:0]
+@200
+-RAM
+@28
+test1_tb.ram.clk
+@22
+test1_tb.ram.last_read_addr[31:0]
+test1_tb.ram.last_read_data[31:0]
+test1_tb.ram.mem_addr[31:0]
+test1_tb.ram.mem_data_r[31:0]
+test1_tb.ram.mem_data_w[31:0]
+@28
+test1_tb.ram.mem_read
+test1_tb.ram.mem_wait
+test1_tb.ram.mem_write
 [pattern_trace] 1
 [pattern_trace] 0

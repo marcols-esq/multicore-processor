@@ -4,10 +4,18 @@ module CORE (
     input  wire                     clk,
     input  wire                     en,
 
+    // PROGRAM ROM
     input  wire [`INST_W-1:0]       progmem_data,
-    output wire [`INST_ADDR_W-1:0]  progmem_addr
-);
+    output wire [`INST_ADDR_W-1:0]  progmem_addr,
 
+    // DATA RAM
+    input  wire [`DATA_W-1:0]       mem_data_r,
+    output wire [`DATA_W-1:0]       mem_data_w,
+    output wire [`DATA_ADDR_W-1:0]  mem_addr,
+    output                          mem_read,
+    output                          mem_write,
+    input                           mem_wait
+);
 
 // STAGE FE with JUMPS
 
@@ -24,7 +32,7 @@ wire [`INST_W-1:0]       FE_ID_inst;
 STAGE_FE stage_fe(
     .clk            (clk),
     .en             (en),
-    .stall          (1'b0),
+    .stall          (mem_wait),
     .flush          (1'b0),
 
     // Jumps
@@ -62,6 +70,7 @@ REGFILE #(
 ) regfile (
 	.clk            (clk),
 	.en             (en),
+	.stall          (mem_wait),
 
 	.wr             (regfile_wr),
 	.addr_wr        (regfile_addr_wr),
@@ -74,6 +83,9 @@ REGFILE #(
 
 wire                     ID_EX_flush;
 wire [`INST_ADDR_W-1:0]  ID_EX_pc;
+
+wire                     ID_EX_is_load;
+wire                     ID_EX_is_store;
 wire                     ID_EX_reg_wr;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_rd;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_r1;
@@ -91,7 +103,7 @@ wire [2:0]               ID_EX_branch_type;
 STAGE_ID stage_id (
     .clk            (clk),
     .en             (en),
-    .stall          (1'b0),
+    .stall          (mem_wait),
 
     // from STAGE_FE
 
@@ -107,6 +119,9 @@ STAGE_ID stage_id (
     // .regfile_data2  (regfile_data2),
     
     // decoded instruction
+
+    .out_is_load         (ID_EX_is_load),
+    .out_is_store        (ID_EX_is_store),
 
     .out_reg_wr          (ID_EX_reg_wr),
     .out_reg_addr_rd     (ID_EX_reg_addr_rd),
@@ -130,9 +145,15 @@ STAGE_ID stage_id (
 
 // STAGE EX
 
+wire                    EX_MM_is_load;
+wire                    EX_MM_is_store;
 wire                    EX_MM_reg_wr;
 wire [`REG_ADDR_W-1:0]  EX_MM_reg_addr_rd;
 wire [`DATA_W-1:0]		EX_MM_reg_data_rd;
+wire [`DATA_W-1:0]		ffw_MM_data_wr;
+// wire [`DATA_W-1:0]		ffw_load_MM_EX;
+// wire                    en_ffw_load_MM_EX;
+wire [`DATA_ADDR_W-1:0] EX_MM_alu_mem_addr;
 
 wire					EX_MM_flush;
 
@@ -143,13 +164,15 @@ wire [`REG_ADDR_W-1:0]  MM_WB_reg_addr_rd;
 STAGE_EX stage_ex(
     .clk                        (clk),
     .en                         (en),
-    .stall                      (1'b0),
+    .stall                      (mem_wait),
 
     // from STAGE_ID
 
     .flush                      (ID_EX_flush || flush_jump),
     .pc                         (ID_EX_pc),
 
+    .is_load                    (ID_EX_is_load),
+    .is_store                   (ID_EX_is_store),
     .reg_wr                     (ID_EX_reg_wr),
     .reg_addr_rd                (ID_EX_reg_addr_rd),
     .reg_addr_r1                (ID_EX_reg_addr_r1),
@@ -171,7 +194,7 @@ STAGE_EX stage_ex(
 	// FFW From STAGE_EX
     .ffw_EX_reg_wr              (EX_MM_reg_wr),
     .ffw_EX_reg_addr_rd         (EX_MM_reg_addr_rd),
-    .ffw_EX_reg_data_rd         (EX_MM_reg_data_rd),
+    .ffw_EX_reg_data_rd         (ffw_MM_data_wr),
 	// FFW From STAGE_MM
     .ffw_MM_reg_wr              (MM_WB_reg_wr),
     .ffw_MM_reg_addr_rd         (MM_WB_reg_addr_rd),
@@ -188,9 +211,12 @@ STAGE_EX stage_ex(
 
     // Execution result
 
+    .out_is_load                (EX_MM_is_load),
+    .out_is_store               (EX_MM_is_store),
     .out_reg_wr                 (EX_MM_reg_wr),
     .out_reg_addr_rd            (EX_MM_reg_addr_rd),
 	.out_reg_data_rd            (EX_MM_reg_data_rd),
+    .out_alu_mem_addr           (EX_MM_alu_mem_addr),
 
 	.out_flush                  (EX_MM_flush)
     
@@ -203,16 +229,28 @@ wire					MM_WB_flush;
 STAGE_MM stage_mm (
     .clk                        (clk),
     .en                         (en),
-    .stall                      (1'b0),
+    .stall                      (mem_wait),
 
     // from STAGE_EX
 
     .flush                      (EX_MM_flush),
 
+    .is_load                    (EX_MM_is_load),
+    .is_store                   (EX_MM_is_store),
 	.reg_wr                     (EX_MM_reg_wr),
 	.reg_addr_rd                (EX_MM_reg_addr_rd),
 	.reg_data_rd                (EX_MM_reg_data_rd),
+	.alu_mem_addr               (EX_MM_alu_mem_addr),
 
+    // Interface with RAM
+
+    .mem_data_r                 (mem_data_r),
+    .mem_data_w                 (mem_data_w),
+    .mem_addr                   (mem_addr),
+    .mem_read                   (mem_read),
+    .mem_write                  (mem_write),
+
+    .ffw_MM_data_wr             (ffw_MM_data_wr),
 
     // To STAGE_WB
 
@@ -228,7 +266,7 @@ STAGE_MM stage_mm (
 STAGE_WB stage_wb (
     // .clk                        (clk),
     // .en                         (en),
-    .stall                      (1'b0),
+    .stall                      (mem_wait),
 
     // from STAGE_MM
 
