@@ -18,7 +18,12 @@
 `define func7_ALU_1   7'b0100000
 
 `define func3_ADD_SUB 3'b000
+`define func3_SLL     3'b001
+`define func3_SLT     3'b010
+`define func3_SLTU    4'b011
 `define func3_XOR	  3'b100
+`define func3_SRL_SRA 3'b101
+`define func3_OR      3'b110
 `define func3_AND	  3'b111
 
 `define func3_BEQ     3'b000
@@ -36,5 +41,11 @@
 
 `define ALU_OP_ADD    4'b0000
 `define ALU_OP_SUB    4'b1000
+`define ALU_OP_SLL    4'b0001
+`define ALU_OP_SLT    4'b0010
+`define ALU_OP_SLTU   4'b0011
 `define ALU_OP_XOR	  4'b0100
+`define ALU_OP_SRL    4'b0101
+`define ALU_OP_SRA    4'b1101
+`define ALU_OP_OR     4'b0110
 `define ALU_OP_AND	  4'b0111

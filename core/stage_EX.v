@@ -90,11 +90,20 @@ module STAGE_EX (
 
 	// ALU
 
+    wire signed [`DATA_W-1:0] alu_arg1_s = alu_arg1;
+    wire signed [`DATA_W-1:0] alu_arg2_s = alu_arg2;
+
 	wire [`DATA_W-1:0] alu_res = 
-		alu_op == `ALU_OP_ADD ?	alu_arg1 + alu_arg2 :
-		alu_op == `ALU_OP_SUB ? alu_arg1 - alu_arg2 :
-		alu_op == `ALU_OP_AND ? alu_arg1 & alu_arg2 :
-		alu_op == `ALU_OP_XOR ? alu_arg1 ^ alu_arg2 :
+        alu_op == `ALU_OP_ADD  ? alu_arg1   +  alu_arg2 :
+        alu_op == `ALU_OP_SUB  ? alu_arg1   -  alu_arg2 :
+        alu_op == `ALU_OP_SLL  ? alu_arg1   << alu_arg2[`REG_ADDR_W-1:0] :
+        alu_op == `ALU_OP_SLT  ? alu_arg1_s <  alu_arg2_s ? `DATA_W'd1 : `DATA_W'd0 :
+        alu_op == `ALU_OP_SLTU ? alu_arg1   <  alu_arg2   ? `DATA_W'd1 : `DATA_W'd0 :
+        alu_op == `ALU_OP_XOR  ? alu_arg1   ^  alu_arg2 :
+        alu_op == `ALU_OP_SRL  ? alu_arg1   >> alu_arg2[`REG_ADDR_W-1:0] :
+        alu_op == `ALU_OP_SRA  ? alu_arg1_s >> alu_arg2[`REG_ADDR_W-1:0] :
+        alu_op == `ALU_OP_OR   ? alu_arg1   |  alu_arg2 :
+        alu_op == `ALU_OP_AND  ? alu_arg1   &  alu_arg2 :
 		`DATA_W'bx;
 
     // JUMPS

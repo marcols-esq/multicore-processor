@@ -192,6 +192,32 @@ wire [`DATA_W-1:0] REG5 = DUT.regfile.REGS[5];
 
 always #10 clk = !clk;
 
+reg [31:0] fifo_fetched_insts [0:4];
+reg [31:0] fifo_jump_addreses [0:4];
+reg        fifo_jumps         [0:4];
+
+
+INST_MONITOR inst_monitor(
+    .clk        (clk),
+    .pc         (progmem_addr),
+    .inst       (progmem_data),
+    .flush      (DUT.stage_wb.flush),
+
+    .is_jump        (DUT.jump),
+    .jump_addr      (DUT.jump_addr),
+
+    .reg_wr         (DUT.regfile_wr),
+    .reg_addr_wr    (DUT.regfile_addr_wr),
+    .reg_data_wr    (DUT.regfile_data_wr),
+
+    .mem_data_r     (mem_data_r),
+    .mem_data_w     (mem_data_w),
+    .mem_addr       (mem_addr),
+    .mem_read       (mem_read),
+    .mem_write      (mem_write),
+    .mem_wait       (mem_wait)
+);
+
 initial begin
     DUT.regfile.REGS[1] = 12;
     DUT.regfile.REGS[2] = 100;

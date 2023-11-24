@@ -90,9 +90,11 @@ module STAGE_ID (
 
 
     wire [3:0]              alu_op          = is_alu ? {is_alu_rev, func3} : `ALU_OP_ADD;
+    // wire                    is_alu_sr       = is_alu_imm && func3 == `func3_SRL_SRA;
 
 
     wire [31:0]             imm             = 
+        // is_alu_sr  ? { {26{inst[31]}}, reg_addr_r2} :
         is_jump    ? { {20{inst[31]}}, imm_I} :
         is_load    ? { {20{inst[31]}}, imm_I} :
         is_alu_imm ? { {20{inst[31]}}, imm_I} :
