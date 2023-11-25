@@ -76,17 +76,23 @@ module INST_MONITOR (
 
             if(FIFO_pc[4] >= 0) begin
                 $write("[%dns] 0x%h (%d) : ", $time, FIFO_pc[4], FIFO_pc[4]);
-                if(FIFO_is_jump[2]) begin
-                    $write("PC  <- 0x%h (%d) ", FIFO_jump_addr[2], FIFO_jump_addr[2] );
-                end else if(FIFO_reg_wr[0]) begin
+                if(FIFO_reg_wr[0]) begin
                     $write("r%h <- 0x%h (%d) ", DEC_TO_2WIDE_HEX(FIFO_reg_addr_wr[0]), FIFO_reg_data_wr[0], FIFO_reg_data_wr[0] );
+                end else if(FIFO_mem_write[1]) begin
+                    $write("STORE  0x%h (%d) ", FIFO_mem_data_w[1], FIFO_mem_data_w[1]);
                 end else if(FIFO_flush[0]) begin
                     $write("* * FLUSHED * * * * * * * * *  ");
                 end else begin
-                    $write("                  (          ) ");
+                    $write("                               ");
                 end
-                if(!FIFO_flush[0])
+                if(!FIFO_flush[0]) begin
                     PRINT_INST_TO_ASM_STR(FIFO_inst[4]);
+                    if(FIFO_is_jump[2]) begin
+                        $write("  | PC  <- 0x%h (%d) ", FIFO_jump_addr[2], FIFO_jump_addr[2] );
+                    end else if(FIFO_mem_write[1] || FIFO_mem_read[1]) begin
+                    $write(" | ADDR = 0x%h (%d) ", FIFO_mem_addr[1], FIFO_mem_addr[1]);
+                end
+                end
                 $display();
             end
         end
@@ -124,6 +130,7 @@ task automatic PRINT_INST_TO_ASM_STR (
     reg [4*8-1:0] alu_op_str;
     reg [3*8-1:0] alu_op_f_str;
     reg [4*8-1:0] be_op_str;
+    reg [2*8-1:0] be_op_f_str;
 begin
     opcode = inst[6:0];
     func3  = inst[14:12];
@@ -173,17 +180,25 @@ begin
         `func3_BLTU  : be_op_str = "BLTU";
         `func3_BGEU  : be_op_str = "BGEU";
     endcase
+    case(func3)
+        `func3_BEQ   : be_op_f_str = "==";
+        `func3_BNE   : be_op_f_str = "!=";
+        `func3_BLT   : be_op_f_str = "< ";
+        `func3_BGE   : be_op_f_str = ">=";
+        `func3_BLTU  : be_op_f_str = "< ";
+        `func3_BGEU  : be_op_f_str = ">=";
+    endcase
 
     if((opcode == `OPCODE_ALUI || opcode == `OPCODE_ALUR) && rd == 0)
         $write("NOP");
     else case(opcode)
-        `OPCODE_LUI    : begin imm_s = imm_U << 12; imm = imm_s; $write("LUI         r%h  =  0x%h (%0d)",           rd_h,  imm, imm_s ); end
-        `OPCODE_ALUI   : begin imm_s = imm_I;       imm = imm_s; $write(  "%s r%h <- r%h %s 0x%h (%0d)",      alu_op_str, rd_h,  rs1_h, alu_op_f_str, imm, imm_s ); end
+        `OPCODE_LUI    : begin imm_s = imm_U << 12; imm = imm_s; $write("LUI         r%h  =  0x%h (%d)",           rd_h,  imm, imm_s ); end
+        `OPCODE_ALUI   : begin imm_s = imm_I;       imm = imm_s; $write(  "%s r%h <- r%h %s 0x%h (%d)",      alu_op_str, rd_h,  rs1_h, alu_op_f_str, imm, imm_s ); end
         `OPCODE_ALUR   : begin imm_s = imm_I;       imm = imm_s; $write(  "%s r%h <- r%h %s r%h",            alu_op_str, rd_h,  rs1_h, alu_op_f_str, rs2_h ); end
-        `OPCODE_BRANCH : begin imm_s = imm_B << 1;  imm = imm_s; $write(  "%s r%h <> r%h,    0x%h (%0d)",     be_op_str,  rs1_h, rs2_h, imm, imm_s ); end
-        `OPCODE_JALR   : begin imm_s = imm_I;       imm = imm_s; $write("JALR r%h,   r%h  +  0x%h (%0d)",     rd_h,  rs1_h, imm, imm_s ); end
-        `OPCODE_LOAD   : begin imm_s = imm_I;       imm = imm_s; $write("LW   r%h <- M[r%h + 0x%h (%0d)]",  rd_h,  rs1_h, imm, imm_s ); end
-        `OPCODE_STORE  : begin imm_s = imm_S;       imm = imm_s; $write("SW   r%h -> M[r%h + 0x%h (%0d)]",  rs2_h, rs1_h, imm, imm_s ); end
+        `OPCODE_BRANCH : begin imm_s = imm_B << 1;  imm = imm_s; $write(  "%s r%h %s r%h,    0x%h (%d)",     be_op_str,  rs1_h, be_op_f_str, rs2_h, imm, imm_s ); end
+        `OPCODE_JALR   : begin imm_s = imm_I;       imm = imm_s; $write("JALR r%h,   r%h  +  0x%h (%d)",     rd_h,  rs1_h, imm, imm_s ); end
+        `OPCODE_LOAD   : begin imm_s = imm_I;       imm = imm_s; $write("LW   r%h <- M[r%h + 0x%h (%d)]",  rd_h,  rs1_h, imm, imm_s ); end
+        `OPCODE_STORE  : begin imm_s = imm_S;       imm = imm_s; $write("SW   r%h -> M[r%h + 0x%h (%d)]",  rs2_h, rs1_h, imm, imm_s ); end
     endcase
 
 end
