@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Sat Nov 25 13:24:58 2023
+[*] Sat Nov 25 14:03:23 2023
 [*]
 [dumpfile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1_tb.vcd"
-[dumpfile_mtime] "Sat Nov 25 13:23:46 2023"
-[dumpfile_size] 100152
+[dumpfile_mtime] "Sat Nov 25 14:02:12 2023"
+[dumpfile_size] 97602
 [savefile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test1.gtkw"
 [timestart] 1344
 [size] 1920 1017
 [pos] -1 -1
-*-5.930773 1476 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.930773 1429 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test1_tb.
 [treeopen] test1_tb.DUT.
 [treeopen] test1_tb.DUT.stage_mm.
@@ -47,8 +47,11 @@ test1_tb.DUT.stage_id.pc[31:0]
 @28
 test1_tb.DUT.stage_id.reg_wr
 test1_tb.DUT.stage_id.is_lui
+@29
 test1_tb.DUT.stage_id.is_store
+@28
 test1_tb.DUT.stage_id.is_load
+test1_tb.DUT.stage_id.is_atomic
 @24
 test1_tb.DUT.stage_id.reg_addr_rd[4:0]
 @22
@@ -184,9 +187,7 @@ test1_tb.ram.mem_data_r[31:0]
 test1_tb.ram.mem_data_w[31:0]
 @28
 test1_tb.ram.mem_wait
-@29
 test1_tb.ram.mem_atomic
-@28
 test1_tb.ram.mem_read
 test1_tb.ram.mem_write
 [pattern_trace] 1

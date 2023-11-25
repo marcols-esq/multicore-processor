@@ -194,7 +194,7 @@ begin
     if((opcode == `OPCODE_ALUI || opcode == `OPCODE_ALUR) && rd == 0)
         $write("NOP");
     else case(opcode)
-        `OPCODE_LUI    : begin imm_s = imm_U << 12; imm = imm_s; $write("LUI         r%h  =  0x%h (%d)",           rd_h,  imm, imm_s ); end
+        `OPCODE_LUI    : begin imm_s = imm_U << 12; imm = imm_s; $write("LUI         r%h <-  0x%h (%d)",           rd_h,  imm, imm_s ); end
         `OPCODE_ALUI   : begin imm_s = imm_I;       imm = imm_s; $write(  "%s r%h <- r%h %s 0x%h (%d)",      alu_op_str, rd_h,  rs1_h, alu_op_f_str, imm, imm_s ); end
         `OPCODE_ALUR   : begin imm_s = imm_I;       imm = imm_s; $write(  "%s r%h <- r%h %s r%h",            alu_op_str, rd_h,  rs1_h, alu_op_f_str, rs2_h ); end
         `OPCODE_BRANCH : begin imm_s = imm_B << 1;  imm = imm_s; $write(  "%s r%h %s r%h,    0x%h (%d)",     be_op_str,  rs1_h, be_op_f_str, rs2_h, imm, imm_s ); end
