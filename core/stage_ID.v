@@ -21,6 +21,7 @@ module STAGE_ID (
     
     // decoded instruction
 
+    output reg                      out_is_atomic,
     output reg                      out_is_load,
     output reg                      out_is_store,
     output reg                      out_reg_wr,
@@ -63,6 +64,7 @@ module STAGE_ID (
 
     wire                    is_store        = !flush && (opcode == `OPCODE_STORE);
     wire                    is_load         = !flush && (opcode == `OPCODE_LOAD);
+    wire                    is_atomic       = func3 == `func3_MEM_WA;
 
     wire                    is_lui          = opcode == `OPCODE_LUI;
 
@@ -129,6 +131,7 @@ module STAGE_ID (
     always @(posedge clk) begin
         if(en && !stall) begin
 
+            out_is_atomic        <= is_atomic;
             out_is_store         <= is_store;
             out_is_load          <= is_load;
             out_reg_wr           <= reg_wr;

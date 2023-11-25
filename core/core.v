@@ -14,6 +14,7 @@ module CORE (
     output wire [`DATA_ADDR_W-1:0]  mem_addr,
     output                          mem_read,
     output                          mem_write,
+    output                          mem_atomic,
     input                           mem_wait
 );
 
@@ -86,6 +87,7 @@ wire [`INST_ADDR_W-1:0]  ID_EX_pc;
 
 wire                     ID_EX_is_load;
 wire                     ID_EX_is_store;
+wire                     ID_EX_is_atomic;
 wire                     ID_EX_reg_wr;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_rd;
 wire [`REG_ADDR_W-1:0]   ID_EX_reg_addr_r1;
@@ -122,6 +124,7 @@ STAGE_ID stage_id (
 
     .out_is_load         (ID_EX_is_load),
     .out_is_store        (ID_EX_is_store),
+    .out_is_atomic       (ID_EX_is_atomic),
 
     .out_reg_wr          (ID_EX_reg_wr),
     .out_reg_addr_rd     (ID_EX_reg_addr_rd),
@@ -147,6 +150,7 @@ STAGE_ID stage_id (
 
 wire                    EX_MM_is_load;
 wire                    EX_MM_is_store;
+wire                    EX_MM_is_atomic;
 wire                    EX_MM_reg_wr;
 wire [`REG_ADDR_W-1:0]  EX_MM_reg_addr_rd;
 wire [`DATA_W-1:0]		EX_MM_reg_data_rd;
@@ -173,6 +177,7 @@ STAGE_EX stage_ex(
 
     .is_load                    (ID_EX_is_load),
     .is_store                   (ID_EX_is_store),
+    .is_atomic                  (ID_EX_is_atomic),
     .reg_wr                     (ID_EX_reg_wr),
     .reg_addr_rd                (ID_EX_reg_addr_rd),
     .reg_addr_r1                (ID_EX_reg_addr_r1),
@@ -213,6 +218,7 @@ STAGE_EX stage_ex(
 
     .out_is_load                (EX_MM_is_load),
     .out_is_store               (EX_MM_is_store),
+    .out_is_atomic              (EX_MM_is_atomic),
     .out_reg_wr                 (EX_MM_reg_wr),
     .out_reg_addr_rd            (EX_MM_reg_addr_rd),
 	.out_reg_data_rd            (EX_MM_reg_data_rd),
@@ -237,6 +243,7 @@ STAGE_MM stage_mm (
 
     .is_load                    (EX_MM_is_load),
     .is_store                   (EX_MM_is_store),
+    .is_atomic                  (EX_MM_is_atomic),
 	.reg_wr                     (EX_MM_reg_wr),
 	.reg_addr_rd                (EX_MM_reg_addr_rd),
 	.reg_data_rd                (EX_MM_reg_data_rd),
@@ -249,6 +256,7 @@ STAGE_MM stage_mm (
     .mem_addr                   (mem_addr),
     .mem_read                   (mem_read),
     .mem_write                  (mem_write),
+    .mem_atomic                 (mem_atomic),
 
     .ffw_MM_data_wr             (ffw_MM_data_wr),
 

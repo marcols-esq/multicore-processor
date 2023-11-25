@@ -12,6 +12,7 @@ module STAGE_MM (
 
 	input  wire 					is_load,
 	input  wire 					is_store,
+    input  wire                     is_atomic,
 	input  wire 					reg_wr,
 	input  wire [`REG_ADDR_W-1:0]	reg_addr_rd,
 	input  wire [`DATA_W-1:0]		reg_data_rd,
@@ -26,6 +27,7 @@ module STAGE_MM (
     output wire [`DATA_ADDR_W-1:0]  mem_addr,
     output                          mem_read,
     output                          mem_write,
+    output                          mem_atomic,
     // input                           mem_wait,
 
     // To STAGE_WB
@@ -40,8 +42,9 @@ module STAGE_MM (
 
 	// Interface with RAM
 
-	assign mem_write	= is_store && !flush;
-	assign mem_read 	= is_load  && !flush;
+	assign mem_write	= is_store  && !flush;
+	assign mem_read 	= is_load   && !flush;
+	assign mem_atomic 	= is_atomic && !flush;
 	assign mem_addr	    = alu_mem_addr;
 
 	assign mem_data_w	= out_reg_data_rd;

@@ -13,6 +13,7 @@ module STAGE_EX (
 
     input  wire                     is_load,
     input  wire                     is_store,
+    input  wire                     is_atomic,
 
     input  wire                     reg_wr,
     input  wire [`REG_ADDR_W-1:0]   reg_addr_rd,
@@ -61,6 +62,7 @@ module STAGE_EX (
 	output reg  [`DATA_W-1:0]		out_reg_data_rd,
 	output reg  [`DATA_ADDR_W-1:0]	out_alu_mem_addr,
     
+    output reg                      out_is_atomic,
     output reg                      out_is_load = 1'b1,
     output reg                      out_is_store = 1'b1,
 
@@ -134,6 +136,7 @@ module STAGE_EX (
 			out_reg_wr 		<= reg_wr   && !flush;
 			out_is_load 	<= is_load  && !flush;
 			out_is_store 	<= is_store && !flush;
+            out_is_atomic   <= is_atomic;
 			out_reg_addr_rd <= reg_addr_rd;
 			out_reg_data_rd <= data_to_wr;
             out_alu_mem_addr<= mem_addr;

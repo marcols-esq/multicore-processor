@@ -35,11 +35,19 @@ end
 endfunction
 
 function [31:0] LOAD (input [4:0] r1, input [11:0] imm, input [4:0] rd); begin
-    LOAD = {imm, r1, 3'b010, rd, `OPCODE_LOAD};
+    LOAD = {imm, r1, `func3_MEM_W, rd, `OPCODE_LOAD};
 end
 endfunction
 function [31:0] STORE (input [4:0] r1, input [11:0] imm, input [4:0] r2); begin
-    STORE = {imm[11:5], r2, r1, 3'b010, imm[4:0], `OPCODE_STORE};
+    STORE = {imm[11:5], r2, r1, `func3_MEM_W, imm[4:0], `OPCODE_STORE};
+end
+endfunction
+function [31:0] LOAD_A (input [4:0] r1, input [11:0] imm, input [4:0] rd); begin
+    LOAD_A = {imm, r1, `func3_MEM_WA, rd, `OPCODE_LOAD};
+end
+endfunction
+function [31:0] STORE_A (input [4:0] r1, input [11:0] imm, input [4:0] r2); begin
+    STORE_A = {imm[11:5], r2, r1, `func3_MEM_WA, imm[4:0], `OPCODE_STORE};
 end
 endfunction
 
@@ -114,10 +122,10 @@ initial begin
     test_progmem[100] = ADDI(5'd0, 12'd200,  5'd1);
     test_progmem[101] = LOAD(5'd1, -12'd100, 5'd2);
     test_progmem[102] = LOAD(5'd0, 12'd200,  5'd3);
-    test_progmem[103] = LOAD(5'd1, 12'd100,  5'd4);
+    test_progmem[103] = LOAD_A(5'd1, 12'd100,  5'd4);
     
     test_progmem[104] = ADDR(5'd3, 5'd4,     5'd5);
-    test_progmem[105] = STORE(5'd1, 12'd0,   5'd5);
+    test_progmem[105] = STORE_A(5'd1, 12'd0,   5'd5);
     test_progmem[106] = LOAD(5'd0, 12'd200,  5'd1);
     test_progmem[107] = LUI(32'hABCDE000, 5'd1);
     test_progmem[108] = JALR(5'd1, -12'h4, 5'd0);
@@ -143,6 +151,7 @@ wire [`DATA_W-1:0]       mem_data_w;
 wire [`DATA_ADDR_W-1:0]  mem_addr;
 wire                     mem_read;
 wire                     mem_write;
+wire                     mem_atomic;
 wire                     mem_wait;
 
 DUMMY_RAM  #(
@@ -158,6 +167,7 @@ DUMMY_RAM  #(
     .mem_addr   (mem_addr),
     .mem_read   (mem_read),
     .mem_write  (mem_write),
+    .mem_atomic (mem_atomic),
     .mem_wait   (mem_wait)
 
 );
@@ -180,6 +190,7 @@ CORE DUT (
     .mem_addr   (mem_addr),
     .mem_read   (mem_read),
     .mem_write  (mem_write),
+    .mem_atomic (mem_atomic),
     .mem_wait   (mem_wait)
 );
 

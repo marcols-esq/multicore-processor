@@ -33,6 +33,8 @@
 `define func3_BLTU	  3'b110
 `define func3_BGEU	  3'b111
 
+`define func3_MEM_W   3'b010
+`define func3_MEM_WA  3'b110
 
 `define ALU_SRC_W     2
 `define ALU_SRC_R     `ALU_SRC_W'h0

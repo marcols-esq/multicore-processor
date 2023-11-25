@@ -11,6 +11,7 @@ module DUMMY_RAM #(
     input  wire [ADDR_W-1:0]        mem_addr,
     input  wire                     mem_read,
     input  wire                     mem_write,
+    input  wire                     mem_atomic,
     output wire                     mem_wait
 
 );
@@ -22,14 +23,16 @@ reg [DATA_W-1:0] last_read_data = 0;
 
 
 assign mem_data_r = last_read_data;
-assign mem_wait   = mem_read && (last_read_addr != mem_addr);
+assign mem_wait   = mem_read && (last_read_addr != mem_addr || last_read_data != data[mem_addr]);
 
 always @(posedge clk) begin
 	if(en) begin
 		if(mem_write) begin
             data[mem_addr] <= mem_data_w;
+            if(mem_atomic) #100;
         end
         if(mem_read) begin
+            if(mem_atomic) #100;
             #21 last_read_data <= data[mem_addr];
                 last_read_addr <= mem_addr;
         end

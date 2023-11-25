@@ -131,6 +131,7 @@ task automatic PRINT_INST_TO_ASM_STR (
     reg [3*8-1:0] alu_op_f_str;
     reg [4*8-1:0] be_op_str;
     reg [2*8-1:0] be_op_f_str;
+    reg [1*8-1:0] atomic_str;
 begin
     opcode = inst[6:0];
     func3  = inst[14:12];
@@ -188,6 +189,7 @@ begin
         `func3_BLTU  : be_op_f_str = "< ";
         `func3_BGEU  : be_op_f_str = ">=";
     endcase
+    atomic_str = func3 == `func3_MEM_WA ? "A" : " ";
 
     if((opcode == `OPCODE_ALUI || opcode == `OPCODE_ALUR) && rd == 0)
         $write("NOP");
@@ -197,8 +199,8 @@ begin
         `OPCODE_ALUR   : begin imm_s = imm_I;       imm = imm_s; $write(  "%s r%h <- r%h %s r%h",            alu_op_str, rd_h,  rs1_h, alu_op_f_str, rs2_h ); end
         `OPCODE_BRANCH : begin imm_s = imm_B << 1;  imm = imm_s; $write(  "%s r%h %s r%h,    0x%h (%d)",     be_op_str,  rs1_h, be_op_f_str, rs2_h, imm, imm_s ); end
         `OPCODE_JALR   : begin imm_s = imm_I;       imm = imm_s; $write("JALR r%h,   r%h  +  0x%h (%d)",     rd_h,  rs1_h, imm, imm_s ); end
-        `OPCODE_LOAD   : begin imm_s = imm_I;       imm = imm_s; $write("LW   r%h <- M[r%h + 0x%h (%d)]",  rd_h,  rs1_h, imm, imm_s ); end
-        `OPCODE_STORE  : begin imm_s = imm_S;       imm = imm_s; $write("SW   r%h -> M[r%h + 0x%h (%d)]",  rs2_h, rs1_h, imm, imm_s ); end
+        `OPCODE_LOAD   : begin imm_s = imm_I;       imm = imm_s; $write("LW%s  r%h <- M[r%h + 0x%h (%d)]",  atomic_str, rd_h,  rs1_h, imm, imm_s ); end
+        `OPCODE_STORE  : begin imm_s = imm_S;       imm = imm_s; $write("SW%s  r%h -> M[r%h + 0x%h (%d)]",  atomic_str, rs2_h, rs1_h, imm, imm_s ); end
     endcase
 
 end
