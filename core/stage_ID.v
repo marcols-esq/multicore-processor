@@ -102,7 +102,8 @@ module STAGE_ID (
         is_alu_imm ? { {20{inst[31]}}, imm_I} :
         is_store   ? { {20{inst[31]}}, imm_S} :
         is_lui     ? { imm_U,          12'd0} :
-        is_branch  ? { {19{inst[31]}}, imm_B, 1'b0 } :
+        is_branch  ? { {20{inst[31]}}, imm_S} : // tutaj powinno być imm_B w RISC-V, ale uznałem, że wygodniej będzie, jak adres instrukcji wskazywał będzie na kolejne słowa, a nie bajty
+        // is_branch  ? { {19{inst[31]}}, imm_B, 1'b0 } :
                      32'hx;
 
     wire [`ALU_SRC_W-1:0]   alu_src_arg1    =

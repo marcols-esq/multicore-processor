@@ -26,11 +26,12 @@ function [31:0] JALR (input [4:0] r1, input [11:0] off, input [4:0] rd); begin
 end
 endfunction
 
-function [31:0] BRANCH (input [2:0] func3, input [4:0] r1, input [4:0] r2, input [12:0] off); 
+function [31:0] BRANCH (input [2:0] func3, input [4:0] r1, input [4:0] r2, input [11:0] off); 
     // reg [12:0] off;
 begin
     // off    = {insts_off, 2'b00};
-    BRANCH = {off[12], off[10:5], r2, r1, func3, off[4:1], off[11], `OPCODE_BRANCH};
+    // BRANCH = {off[12], off[10:5], r2, r1, func3, off[4:1], off[11], `OPCODE_BRANCH};
+    BRANCH = {off[11:5], r2, r1, func3, off[4:0], `OPCODE_BRANCH}; // Uznaję, że każdy adres wskazuje na 32-bitowy word, nie na kolejne bajty
 end
 endfunction
 
@@ -57,7 +58,7 @@ reg [`INST_W-1:0] test_progmem [0:400];
 initial begin
     test_progmem[0] = {12'd2,  5'd0, `func3_ADD_SUB, 5'd0, `OPCODE_ALUI};
     test_progmem[1] = {-12'd10, 5'd0, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
-    test_progmem[2] = JALR(5'd0, 12'd35*4, 5'd5);
+    test_progmem[2] = JALR(5'd0, 12'd35, 5'd5);
     test_progmem[3] = {7'd0, 5'd2, 5'd1, `func3_ADD_SUB, 5'd4, `OPCODE_ALUR};
     test_progmem[4] = {7'd0, 5'd2, 5'd1, `func3_AND, 5'd5, `OPCODE_ALUR};
 
@@ -93,12 +94,12 @@ initial begin
     test_progmem[30] = NOP;
     test_progmem[31] = NOP;
     test_progmem[32] = {12'h040,  5'd2, `func3_ADD_SUB, 5'd3, `OPCODE_ALUI};
-    test_progmem[33] = JALR(5'd0, 12'd100 * 4, 5'd0);
+    test_progmem[33] = JALR(5'd0, 12'd100, 5'd0);
 
     test_progmem[34] = NOP;
     test_progmem[35] = ADDI(5'd0, 12'd0,  5'd3);
     test_progmem[36] = ADDI(5'd0, 12'd2,  5'd2);
-    test_progmem[37] = BRANCH(`func3_BEQ, 5'd2, 5'd2, 12'd10 * 4);
+    test_progmem[37] = BRANCH(`func3_BEQ, 5'd2, 5'd2, 12'd10);
     test_progmem[38] = ADDI(5'd0, 12'd10, 5'd3);
     test_progmem[39] = ADDI(5'd0, 12'd11, 5'd3);
     
@@ -107,17 +108,15 @@ initial begin
     test_progmem[47] = ADDI(5'd0, 12'd2, 5'd3);
     test_progmem[48] = ADDI(5'd3, 12'h10, 5'd3);
     test_progmem[49] = ADDI(5'd2, -12'h1, 5'd2);
-    test_progmem[50] = BRANCH(`func3_BNE, 5'd2, 5'd0, -12'd2 * 4);
+    test_progmem[50] = BRANCH(`func3_BNE, 5'd2, 5'd0, -12'd2);
     
     test_progmem[51] = ADDI(5'd0, -12'h1, 5'd1);
     test_progmem[52] = ADDI(5'd0,  12'h2, 5'd2);
-    test_progmem[53] = BRANCH(`func3_BLT,  5'd1, 5'd2, 12'd2 * 4);
+    test_progmem[53] = BRANCH(`func3_BLT,  5'd1, 5'd2, 12'd2);
     test_progmem[54] = ADDI(5'd0,  12'hAA, 5'd3);
-    test_progmem[55] = BRANCH(`func3_BLTU, 5'd1, 5'd2, 12'd2 * 4);
+    test_progmem[55] = BRANCH(`func3_BLTU, 5'd1, 5'd2, 12'd2);
     test_progmem[56] = ADDI(5'd0,  12'hBB, 5'd3);
     test_progmem[57] = JALR(5'd5, 12'd0, 5'd0);
-
-    // test_progmem[99] = JALR(5'd0, 12'd99*4, 5'd0);
 
     test_progmem[100] = ADDI(5'd0, 12'd200,  5'd1);
     test_progmem[101] = LOAD(5'd1, -12'd100, 5'd2);
@@ -143,7 +142,7 @@ initial begin
 end
 
 wire [`INST_ADDR_W-1:0]  progmem_addr;
-wire [`INST_W-1:0]       progmem_data = test_progmem[progmem_addr >> 2];
+wire [`INST_W-1:0]       progmem_data = test_progmem[progmem_addr];
 
 
 wire [`DATA_W-1:0]       mem_data_r;

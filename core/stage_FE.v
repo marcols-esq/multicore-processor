@@ -28,7 +28,7 @@ module STAGE_FE(
 
     // Program counter
     reg  [`INST_ADDR_W-1:0] PC      = 0;
-    wire [`INST_ADDR_W-1:0] PC_next = jump ? jump_addr : PC + 3'h4;    
+    wire [`INST_ADDR_W-1:0] PC_next = jump ? jump_addr : PC + 1'h1;    
 
     assign progmem_addr = PC;
     wire [`INST_W-1:0] inst = progmem_data;

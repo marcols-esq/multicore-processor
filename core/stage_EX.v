@@ -126,7 +126,7 @@ module STAGE_EX (
     assign             jump_addr    = alu_res;
     assign             mem_addr     = alu_res;
 
-    wire [`DATA_W-1:0] data_to_wr   = is_jump   ? pc + 3'd4     :
+    wire [`DATA_W-1:0] data_to_wr   = is_jump   ? pc + 3'd1     :
                                       is_store  ? reg_data_r2_ffw :
                                                   alu_res;
     // Pipelining registers
