@@ -27,12 +27,6 @@ begin
         if (REQ[last_access] == 0) begin
             if (RoundRobin) begin
                 ACCESS = '0;
-                // patient wait (with dead cycles)
-                // last_access = last_access + 1; 
-                // if (REQ[last_access] == 1) begin
-                //     ACCESS[last_access] <= 1;
-                // end
-                // jumping in
                 while (REQ[last_access] != 1) begin
                     last_access = last_access + 1;
                 end
