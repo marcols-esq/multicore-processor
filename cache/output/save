@@ -1,0 +1,9 @@
+#! /bin/bash
+
+if [ -f ./output/cache_tb.lxt ]; then
+	rm ./output/cache_tb.lxt
+fi
+iverilog -Wall -o output/cache_tb.vvp tb/cache_tb.v src/cache.v && vvp output/cache.vvp -lxt2
+if ! [[ $1 == "-q" ]]; then
+	gtkwave output/cache_tb.lxt output/cache_tb.gtkw >> /dev/null & disown && sleep 2 && echo ''
+fi
