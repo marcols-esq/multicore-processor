@@ -1,9 +1,16 @@
 #! /bin/bash
 
-if [ -f ./output/cache_tb.lxt ]; then
-	rm ./output/cache_tb.lxt
+if [[ $2 == "" ]]; then
+	module="cache"
+else
+	module="$2"
 fi
-iverilog -Wall -o output/cache_tb.vvp tb/cache_tb.v src/cache.v && vvp output/cache.vvp -lxt2
+
+if [ -f ./output/$module\_tb.lxt ]; then
+	rm ./output/$module\_tb.lxt
+fi
+iverilog -Wall -o output/$module\_tb.vvp tb/$module\_tb.v src/$module\.v && vvp output/$module\_tb.vvp -lxt2
 if ! [[ $1 == "-q" ]]; then
-	gtkwave output/cache_tb.lxt output/cache_tb.gtkw >> /dev/null & disown && sleep 2 && echo ''
+	gtkwave output/$module\_tb.lxt output/$module\_tb.gtkw >> /dev/null & disown && sleep 2 && echo ''
 fi
+

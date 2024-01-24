@@ -20,6 +20,8 @@ wire ram_atomic;
 reg ram_wait;
 reg [31:0] ram_data_r;
 
+reg FIFO_clr_n;
+
 my_cache UUT(
 	.clk(clk),
 
@@ -40,7 +42,9 @@ my_cache UUT(
 	.ram_atomic(ram_atomic),
 
 	.cpu_wait(cpu_wait),
-	.cpu_data_r(cpu_data_r)	//32
+	.cpu_data_r(cpu_data_r),	//32
+
+	.FIFO_clr_n(FIFO_clr_n)
 );
 
 always #5 clk = ~clk;
@@ -53,13 +57,15 @@ initial begin
 	cpu_atomic = 0;
 	ram_wait = 0;
 	ram_data_r = 0;
+	FIFO_clr_n = 0;
 
+	#10 FIFO_clr_n = 1;
 	#10 cpu_addr = 32'd39;
 	#10 cpu_data_w = 32'd1115;
 	   ram_wait = 1;
 	#10 cpu_write = 1;
 	#10 ram_wait = 0;
-	#10 cpu_write = 0;
+	#20 cpu_write = 0;
 	#10 cpu_read = 1;
 	#10 cpu_read = 0;
 	#10 cpu_addr = 32'd40;
