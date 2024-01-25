@@ -11,13 +11,11 @@ module FIFO #(
 
 	output	[FIFO_WIDTH-1:0]	data_out,
 	output reg [FIFO_PNTR_W-1:0] cnt
-
 );
 
 reg [FIFO_WIDTH-1:0] FIFO [0:FIFO_DEPTH-1];
 reg [FIFO_PNTR_W-1:0] top;
 reg [FIFO_PNTR_W-1:0] btm;
-
 
 reg [FIFO_DEPTH:0] i = 0;
 
@@ -28,7 +26,7 @@ always @(posedge clk or negedge FIFO_clr_n) begin
 		cnt <= 0;
 		for (i = 0; i < FIFO_DEPTH; i=i+1)
 									FIFO[i] <= 0;
-	end
+	end else
 	if (!FIFO_reset_n) begin
 		top <= 0;
 		btm <= 0;
@@ -51,6 +49,11 @@ always @(posedge clk or negedge FIFO_clr_n) begin
 				FIFO[top] <= data_in;
 				top <= top + 1;
 				btm <= btm + 1;
+			end
+		default:
+			begin
+				top <= top;
+				cnt <= cnt;
 			end
 	endcase
 end

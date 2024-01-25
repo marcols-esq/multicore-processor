@@ -1,6 +1,6 @@
+`include "./src/FIFO.v"
 `timescale 1ns/1ns
 `include "../core/defines.vh"
-`include "./src/FIFO.v"
 
 module my_cache(
 	input	clk,
@@ -18,7 +18,7 @@ module my_cache(
 	output reg [`DATA_W-1:0]		ram_data_w,
 	output reg [`DATA_ADDR_W-1:0]	ram_addr,
 	output reg						ram_read,
-	output reg						ram_write,
+	output reg						ram_write = 0,
 	output							ram_atomic,
 	input							ram_wait,
 	input	[`DATA_W-1:0]			ram_data_r,
@@ -74,7 +74,7 @@ reg [533:0] cache_page [0:255];
 reg [4:0] i = 0;
 reg [8:0] j = 0;
 reg [7:0] fifo_in = 0;
-wire [7:0] fifo_out = 0;
+wire [7:0] fifo_out;
 reg push = 0;
 reg pop = 0;
 wire [7:0] fifo_cnt;
@@ -114,15 +114,15 @@ always @(posedge clk) begin
 			cpu_wait <= 1'b0;
 		end
 	end
-	else if (fifo_cnt > 0) begin
+	else if (fifo_cnt) begin
 		if (cache_page [fifo_out] [533:532] == 2'b11) begin									// if valid and to_sync (newer data not synced with ram)
 			for (i = 0; i < 16; i=i+1) begin
-				ram_addr <= {cache_page[fifo_out][531:512], fifo_out, i[3:0]};
-				ram_write <= 1'b0;
-				wait (ram_wait == 0);														// remove the need for wait with two ifs
-				ram_data_w <= READ_DOUBLE(i[3:0],fifo_out);
+				ram_addr <= {cache_page[fifo_out[7:0]][531:512], fifo_out[7:0], i[3:0]};
 				ram_write <= 1'b1;
+				wait (ram_wait == 0);														// remove the need for wait with two ifs
+				ram_data_w <= READ_DOUBLE(i[3:0],fifo_out[7:0]);
 			end																				// ### remove this for, one check is enough
+			ram_write <= 1'b0;
 			cache_page [fifo_out] [532] <= 1'b0;											// reset to_sync bit
 		end
 		pop <= 1;

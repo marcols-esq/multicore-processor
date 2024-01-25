@@ -62,10 +62,18 @@ initial begin
 	#10 FIFO_clr_n = 1;
 	#10 cpu_addr = 32'd39;
 	#10 cpu_data_w = 32'd1115;
-	   ram_wait = 1;
+		ram_wait = 1;
 	#10 cpu_write = 1;
 	#10 ram_wait = 0;
 	#20 cpu_write = 0;
+
+	#10 cpu_addr = 32'd67;
+	#10 cpu_data_w = 32'd7777;
+		ram_wait = 1;
+	#10 cpu_write = 1;
+	#10 ram_wait = 0;
+	#20 cpu_write = 0;
+
 	#10 cpu_read = 1;
 	#10 cpu_read = 0;
 	#10 cpu_addr = 32'd40;
