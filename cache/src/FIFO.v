@@ -10,7 +10,7 @@ module FIFO #(
 	input	clk, FIFO_clr_n, FIFO_reset_n, push, pop,
 
 	output	[FIFO_WIDTH-1:0]	data_out,
-	output reg [FIFO_PNTR_W-1:0] cnt
+	output reg [FIFO_CNTR_W-1:0] cnt
 );
 
 reg [FIFO_WIDTH-1:0] FIFO [0:FIFO_DEPTH-1];

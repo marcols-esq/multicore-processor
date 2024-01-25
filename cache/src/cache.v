@@ -2,7 +2,12 @@
 `timescale 1ns/1ns
 `include "../core/defines.vh"
 
-module my_cache(
+module my_cache #(
+	parameter FIFO_WIDTH = 0,
+	parameter FIFO_DEPTH = 0,
+	parameter FIFO_PNTR_W = 0,
+	parameter FIFO_CNTR_W = 0
+)(
 	input	clk,
 
 	// CPU interface
@@ -19,13 +24,15 @@ module my_cache(
 	output reg [`DATA_ADDR_W-1:0]	ram_addr,
 	output reg						ram_read,
 	output reg						ram_write = 0,
-	output							ram_atomic,
 	input							ram_wait,
 	input	[`DATA_W-1:0]			ram_data_r,
 
+	output reg						cache_atomic_o = 0,
+	input							cache_atomic_i,
+	input							arbiter_permit,
 	input							FIFO_clr_n
 );
-// valid[533] to_sync[532] 20_oldest_addr_b[531:511] 32_data_b*16[511:0]
+//atomic [534] valid[533] to_sync[532] 20_oldest_addr_b[531:511] 32_data_b*16[511:0]
 //wire [1+20+16*`DATA_W-1:0] 
 
 function [32-1:0] READ_DOUBLE (input [3:0] shift, input [7:0] line);
@@ -70,14 +77,17 @@ task REFRESH(input [3:0] shift, input [7:0] line, input [31:0] source_data);
 	endcase
 endtask
 
-reg [533:0] cache_page [0:255];
+reg [534:0] cache_page [0:255];
 reg [4:0] i = 0;
 reg [8:0] j = 0;
-reg [7:0] fifo_in = 0;
-wire [7:0] fifo_out;
+reg [FIFO_WIDTH-1:0] fifo_in = 0;
+wire [FIFO_WIDTH-1:0] fifo_out;
 reg push = 0;
 reg pop = 0;
-wire [7:0] fifo_cnt;
+wire [FIFO_CNTR_W-1:0] fifo_cnt;
+//reg cache_atomic_internal = 0;
+
+//assign cache_atomic = cache_atomic_internal;
 
 always @(posedge clk) begin
 	if (cpu_write || cpu_read) begin																					// if write or read
@@ -99,6 +109,7 @@ always @(posedge clk) begin
 		if ((cache_page [cpu_addr[11:4]] [531:512] == cpu_addr[31:12]) && (cache_page [cpu_addr[11:4]] [533])) begin	// check if 20 page bits match & if valid
 			cache_page [cpu_addr[11:4]] [531:512] <= cpu_addr[31:12];						// update page address received from CPU
 			REFRESH(cpu_addr[3:0],cpu_addr[11:4],cpu_data_w[31:0]);
+			cache_page [cpu_addr[11:4]] [534] <= cpu_atomic;								// set atomic bit
 			cache_page [cpu_addr[11:4]] [533] <= 1'b1;										// set valid bit
 			cache_page [cpu_addr[11:4]] [532] <= 1'b1;										// set to_sync bit
 			fifo_in [7:0] <= cpu_addr[11:4];
@@ -116,11 +127,12 @@ always @(posedge clk) begin
 	end
 	else if (fifo_cnt) begin
 		if (cache_page [fifo_out] [533:532] == 2'b11) begin									// if valid and to_sync (newer data not synced with ram)
+			cache_atomic_o <= cache_page [fifo_out] [534];
 			for (i = 0; i < 16; i=i+1) begin
-				ram_addr <= {cache_page[fifo_out[7:0]][531:512], fifo_out[7:0], i[3:0]};
+				ram_addr <= {cache_page[fifo_out][531:512], fifo_out, i[3:0]};
 				ram_write <= 1'b1;
 				wait (ram_wait == 0);														// remove the need for wait with two ifs
-				ram_data_w <= READ_DOUBLE(i[3:0],fifo_out[7:0]);
+				ram_data_w <= READ_DOUBLE(i[3:0],fifo_out);
 			end																				// ### remove this for, one check is enough
 			ram_write <= 1'b0;
 			cache_page [fifo_out] [532] <= 1'b0;											// reset to_sync bit
@@ -132,10 +144,10 @@ always @(posedge clk) begin
 end
 
 FIFO #(
-	.FIFO_WIDTH(8),
-	.FIFO_DEPTH(256),
-	.FIFO_PNTR_W(8),
-	.FIFO_CNTR_W(8)
+	.FIFO_WIDTH(FIFO_WIDTH),
+	.FIFO_DEPTH(FIFO_DEPTH),
+	.FIFO_PNTR_W(FIFO_PNTR_W),
+	.FIFO_CNTR_W(FIFO_CNTR_W)
 )FIFO_sync(
 	.data_in(fifo_in),
 	.clk(clk),

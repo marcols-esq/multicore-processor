@@ -4,6 +4,7 @@
 module cache_tb();
 
 reg clk = 1;
+
 reg [31:0] cpu_data_w;
 reg [31:0] cpu_addr;
 reg cpu_read;
@@ -16,13 +17,27 @@ wire [31:0] ram_data_w;
 wire [31:0] ram_addr;
 wire ram_read;
 wire ram_write;
-wire ram_atomic;
 reg ram_wait;
 reg [31:0] ram_data_r;
 
 reg FIFO_clr_n;
+wire atomic_external;
 
-my_cache UUT(
+wire atomic1_i;
+wire atomic2_i;
+wire atomic3_i;
+wire atomic4_i;
+wire atomic1_o = 0;
+wire atomic2_o = 0;
+wire atomic3_o = 0;
+wire atomic4_o = 0;
+
+my_cache #(
+	.FIFO_WIDTH(8),
+	.FIFO_DEPTH(256),
+	.FIFO_PNTR_W(9),
+	.FIFO_CNTR_W(9)
+)UUT(
 	.clk(clk),
 
 	.cpu_data_w(cpu_data_w),	//32
@@ -34,18 +49,24 @@ my_cache UUT(
 	.ram_wait(ram_wait),
 	.ram_data_r(ram_data_r),		//32
 
-
 	.ram_data_w(ram_data_w),	//32
 	.ram_addr(ram_addr),		//32
 	.ram_read(ram_read),
 	.ram_write(ram_write),
-	.ram_atomic(ram_atomic),
 
 	.cpu_wait(cpu_wait),
 	.cpu_data_r(cpu_data_r),	//32
 
+	.cache_atomic_o(atomic1_o),
+	.cache_atomic_i(atomic1_i),
+	.arbiter_permit(1'b0),
 	.FIFO_clr_n(FIFO_clr_n)
 );
+
+assign atomic1_i = atomic2_o | atomic3_o | atomic4_o;
+assign atomic2_i = atomic1_o | atomic3_o | atomic4_o;
+assign atomic3_i = atomic1_o | atomic2_o | atomic4_o;
+assign atomic4_i = atomic1_o | atomic2_o | atomic3_o;
 
 always #5 clk = ~clk;
 
