@@ -33,7 +33,6 @@ module my_cache #(
 	input						FIFO_clr_n
 );
 //atomic [534] valid[533] to_sync[532] 20_oldest_addr_b[531:511] 32_data_b*16[511:0]
-//wire [1+20+16*`DATA_W-1:0] 
 
 function [32-1:0] READ_DOUBLE (input [3:0] shift, input [7:0] line);
 	case (shift)
@@ -86,9 +85,7 @@ reg push = 0;
 reg pop = 0;
 wire [FIFO_CNTR_W-1:0] fifo_cnt;
 reg [`DATA_ADDR_W-1:0] ram_addr_i;
-//reg cache_atomic_internal = 0;
 
-//assign cache_atomic = cache_atomic_internal;
 assign ram_addr = ram_addr_i;
 
 always @(posedge clk) begin
@@ -172,6 +169,3 @@ FIFO #(
 
 endmodule
 
-/* TODO
-- jak ustawiać not valid linii cache'a (osobna szyna adresowa pomiędzy cache'ami czy output do ramu inout)
-- skąd się biorą dane i adresy atomic. (wewnętrzne szyny adresowe pomiędzy cache'ami czy od strony RAMu)
