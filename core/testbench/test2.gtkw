@@ -1,0 +1,195 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sun Jan 28 21:20:37 2024
+[*]
+[dumpfile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test2_tb.vcd"
+[dumpfile_mtime] "Sun Jan 28 21:18:03 2024"
+[dumpfile_size] 30550
+[savefile] "C:\Users\bondg\Desktop\Dev\multicore-processor\core\testbench\test2.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -1 -1
+*-5.930773 337 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test2_tb.
+[treeopen] test2_tb.DUT.
+[treeopen] test2_tb.DUT.stage_mm.
+[sst_width] 211
+[signals_width] 478
+[sst_expanded] 1
+[sst_vpaned_height] 377
+@200
+-FE
+@28
+test2_tb.ram.mem_wait
+test2_tb.DUT.stage_fe.clk
+[color] 2
+test2_tb.DUT.stage_fe.flush
+test2_tb.DUT.stage_fe.stall
+@24
+test2_tb.DUT.stage_fe.PC[31:0]
+@22
+test2_tb.DUT.stage_fe.PC[31:0]
+@28
+test2_tb.DUT.stage_fe.en
+test2_tb.DUT.stage_fe.jump
+@24
+test2_tb.DUT.stage_fe.jump_addr[31:0]
+@22
+test2_tb.DUT.stage_fe.inst[31:0]
+@200
+-ID
+@28
+[color] 2
+test2_tb.DUT.stage_id.flush
+test2_tb.DUT.stage_id.stall
+@24
+test2_tb.DUT.stage_id.pc[31:0]
+@28
+test2_tb.DUT.stage_id.reg_wr
+test2_tb.DUT.stage_id.is_lui
+test2_tb.DUT.stage_id.is_store
+test2_tb.DUT.stage_id.is_load
+test2_tb.DUT.stage_id.is_atomic
+@24
+test2_tb.DUT.stage_id.reg_addr_rd[4:0]
+@22
+test2_tb.DUT.stage_id.alu_op[3:0]
+@24
+test2_tb.DUT.stage_id.reg_addr_r1[4:0]
+test2_tb.DUT.stage_id.reg_addr_r2[4:0]
+@22
+test2_tb.DUT.stage_id.imm[31:0]
+@24
+test2_tb.DUT.stage_id.imm[31:0]
+@22
+test2_tb.DUT.stage_id.alu_src_arg1[1:0]
+test2_tb.DUT.stage_id.alu_src_arg2[1:0]
+@28
+test2_tb.DUT.stage_id.is_jump
+test2_tb.DUT.stage_id.is_branch
+test2_tb.DUT.stage_id.branch_type[2:0]
+@200
+-EX
+@28
+[color] 2
+test2_tb.DUT.stage_ex.flush
+test2_tb.DUT.stage_ex.stall
+@24
+test2_tb.DUT.stage_ex.pc[31:0]
+@22
+test2_tb.DUT.stage_ex.alu_op[3:0]
+test2_tb.DUT.stage_ex.alu_src_arg1[1:0]
+test2_tb.DUT.stage_ex.alu_src_arg2[1:0]
+test2_tb.DUT.stage_ex.reg_data_r1[31:0]
+test2_tb.DUT.stage_ex.reg_data_r2[31:0]
+test2_tb.DUT.stage_ex.ffw_EX_reg_data_rd[31:0]
+test2_tb.DUT.stage_ex.ffw_MM_reg_data_rd[31:0]
+test2_tb.DUT.stage_ex.imm[31:0]
+test2_tb.DUT.stage_ex.reg_data_r1_ffw[31:0]
+test2_tb.DUT.stage_ex.reg_data_r2_ffw[31:0]
+test2_tb.DUT.stage_ex.alu_res[31:0]
+@420
+test2_tb.DUT.stage_ex.alu_res[31:0]
+@28
+test2_tb.DUT.stage_ex.jump
+@24
+test2_tb.DUT.stage_ex.jump_addr[31:0]
+@28
+test2_tb.DUT.stage_ex.is_jump
+test2_tb.DUT.stage_ex.is_branch
+test2_tb.DUT.stage_ex.branch_type[2:0]
+test2_tb.DUT.stage_ex.reg_wr
+@c00024
+test2_tb.DUT.stage_ex.data_to_wr[31:0]
+@28
+(0)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(1)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(2)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(3)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(4)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(5)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(6)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(7)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(8)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(9)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(10)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(11)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(12)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(13)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(14)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(15)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(16)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(17)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(18)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(19)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(20)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(21)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(22)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(23)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(24)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(25)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(26)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(27)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(28)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(29)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(30)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+(31)test2_tb.DUT.stage_ex.data_to_wr[31:0]
+@1401200
+-group_end
+@24
+test2_tb.DUT.stage_ex.reg_addr_rd[4:0]
+@28
+test2_tb.DUT.stage_ex.is_store
+test2_tb.DUT.stage_ex.is_load
+@200
+-MM
+@28
+[color] 2
+test2_tb.DUT.stage_mm.flush
+test2_tb.DUT.stage_mm.stall
+test2_tb.DUT.stage_mm.reg_wr
+test2_tb.DUT.stage_mm.is_load
+test2_tb.DUT.stage_mm.is_store
+@24
+test2_tb.DUT.stage_mm.alu_mem_addr[31:0]
+@22
+test2_tb.DUT.stage_mm.true_data_to_wr[31:0]
+test2_tb.DUT.stage_mm.out_reg_data_rd[31:0]
+test2_tb.DUT.stage_mm.reg_data_rd[31:0]
+@200
+-WB
+@28
+[color] 2
+test2_tb.DUT.stage_wb.flush
+test2_tb.DUT.stage_wb.stall
+@29
+test2_tb.DUT.stage_wb.regfile_wr
+@24
+test2_tb.DUT.stage_wb.regfile_addr_wr[4:0]
+@22
+test2_tb.DUT.stage_wb.regfile_data_wr[31:0]
+@200
+-REGS
+@22
+test2_tb.REG1[31:0]
+test2_tb.REG2[31:0]
+test2_tb.REG3[31:0]
+test2_tb.REG4[31:0]
+test2_tb.REG5[31:0]
+@200
+-RAM
+@28
+test2_tb.ram.clk
+@22
+test2_tb.ram.last_read_addr[31:0]
+test2_tb.ram.last_read_data[31:0]
+test2_tb.ram.mem_addr[31:0]
+test2_tb.ram.mem_data_r[31:0]
+test2_tb.ram.mem_data_w[31:0]
+@28
+test2_tb.ram.mem_wait
+test2_tb.ram.mem_atomic
+test2_tb.ram.mem_read
+test2_tb.ram.mem_write
+[pattern_trace] 1
+[pattern_trace] 0

@@ -47,7 +47,7 @@ module STAGE_MM (
 	assign mem_atomic 	= is_atomic && !flush;
 	assign mem_addr	    = alu_mem_addr;
 
-	assign mem_data_w	= out_reg_data_rd;
+	assign mem_data_w	= reg_data_rd;
 
 	wire [`DATA_W-1:0] true_data_to_wr = is_load ? mem_data_r : reg_data_rd;
 	
