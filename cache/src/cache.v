@@ -32,7 +32,7 @@ module my_cache #(
 	input						arbiter_permit,
 	input						FIFO_clr_n
 );
-//atomic [534] valid[533] to_sync[532] 20_oldest_addr_b[531:511] 32_data_b*16[511:0]
+//atomic [534] valid[533] to_sync[532] 20_oldest_addr_b[531:512] 32_data_b*16[511:0]
 
 function [32-1:0] READ_DOUBLE (input [3:0] shift, input [7:0] line);
 	case (shift)
@@ -92,6 +92,7 @@ always @(posedge clk) begin
 	if (cache_atomic_i) begin
 		cache_page [ram_addr[11:4]] [531:512] <= ram_addr[31:12];
 		REFRESH(ram_addr[3:0],ram_addr[11:4],ram_data_r[31:0]);
+		cache_page [ram_addr[11:4]] [533] <= 1'b1;										// set valid bit
 	end
 	else begin
 		if (cpu_write || cpu_read) begin																					// if write or read
@@ -134,9 +135,9 @@ always @(posedge clk) begin
 				for (i = 0; i < 16; i=i+1) begin
 					ram_addr_i <= {cache_page[fifo_out][531:512], fifo_out, i[3:0]};
 					ram_write <= 1'b1;
-					wait (ram_wait == 0);														// remove the need for wait with two ifs
+					wait (ram_wait == 0);
 					ram_data_w <= READ_DOUBLE(i[3:0],fifo_out);
-				end																				// ### remove this for, one check is enough
+				end
 				cache_atomic_o <= cache_page [fifo_out] [534];
 				pop <= 1;
 				@(posedge clk)
